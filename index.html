@@ -868,6 +868,7 @@ let currentIdx   = 0;
 let totalSegs    = 0;
 let currentVideoId = '';
 let currentUser  = null; // { first, last }
+let initialized  = false;
 
 /* ================================================================
    LOCAL STORAGE — all annotations stored per-user per-video
@@ -1001,10 +1002,11 @@ function populateVideoList() {
 }
 
 function switchVideo(videoId) {
-  if (currentVideoId) {
+  if (currentVideoId && initialized) {
     autoSaveCurrent();
     saveAnnotationsLocal();
   }
+  initialized = false;
   currentVideoId = videoId;
   const entry = VIDEOS.find(v => v.id === videoId);
   document.getElementById('videoBadge').textContent = entry ? entry.label : videoId;
@@ -1109,8 +1111,10 @@ function updateProgress() {
    NAVIGATION
    ================================================================ */
 function goToSegment(idx) {
-  autoSaveCurrent();
-  saveAnnotationsLocal();
+  if (initialized) {
+    autoSaveCurrent();
+    saveAnnotationsLocal();
+  }
   currentIdx = Math.max(0, Math.min(idx, segments.length - 1));
   const seg = segments[currentIdx];
 
@@ -1128,6 +1132,7 @@ function goToSegment(idx) {
   updateProgress();
 
   document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
+  initialized = true;
 }
 
 /* ================================================================
