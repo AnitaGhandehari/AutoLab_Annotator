@@ -736,38 +736,64 @@
 
       <div class="instr-section">
         <h2><span class="step-num">1</span> Your Task</h2>
-        <p>Assume you are explaining a video of a <strong>scientific experiment</strong> to a grad student with <strong>visual impairment</strong> who cannot see the scene, but needs to know the critical steps. Your explanation should be <strong>complete, structured, and sequential</strong>, as if you are narrating what is happening in real time.</p>
-        <div class="instr-tip"><strong>Why this matters:</strong> We will use your annotation to grade a Vision-Language Model (VLM) that is challenged with the same task, so the more informative and precise your description, the better.</div>
+        <p>
+          Assume you are explaining a video of a <strong>scientific experiment</strong> to a grad student
+          with <strong>visual impairment</strong> who cannot see the scene, but needs to know the critical steps.
+          You should describe everything in a way that allows the student to <strong>reconstruct the experiment</strong>.
+        </p>
+        <p style="margin-top:10px;">
+          Your explanation should be <strong>complete, structured, and sequential</strong>, as if you are narrating
+          what is happening in real time.
+        </p>
+        <div class="instr-tip">
+          <strong>Why this matters:</strong> We will use your annotation to grade a Vision-Language Model (VLM) that is
+          challenged with the same task, so the more informative and precise your description, the better.
+        </div>
       </div>
 
       <div class="instr-section">
-        <h2><span class="step-num">2</span> What to Include</h2>
+        <h2><span class="step-num">2</span> What to Include in Each Step</h2>
+        <p>
+          Walk the student through the procedure the same way you'd walk them through it in person.
+          For every step, try to convey:
+        </p>
         <ul>
-          <li><strong>What is being used:</strong> instruments, containers, reagents, samples. Briefly describe new items (e.g., "a P200 micropipette").</li>
-          <li><strong>What is being done:</strong> use specific verbs like <em>pipettes, aspirates, dispenses, vortexes, inverts, centrifuges, weighs, dissolves, transfers</em>.</li>
-          <li><strong>Measurable values:</strong> volumes, masses, concentrations, temperatures, durations visible on screen.</li>
-          <li><strong>Visible changes:</strong> color shifts, precipitation, bubbling, phase separation, dissolution.</li>
-          <li><strong>How things come together:</strong> e.g., "the tube is loaded into the centrifuge rotor and the lid is closed."</li>
+          <li><strong>What is being used:</strong> the instruments, containers, reagents, and samples involved. The first time something appears, briefly say what it is so the student can picture it (e.g., "a P200 micropipette," "a 1.5 mL microcentrifuge tube with a clear colorless liquid inside").</li>
+          <li><strong>What is being done:</strong> the action itself. Please use specific action verbs like <em>pipettes, aspirates, dispenses, vortexes, inverts, decants, centrifuges, weighs, dissolves, transfers, incubates</em>, rather than vague ones like <em>uses, puts,</em> or <em>does</em>. The student is relying on the verb to understand the motion, so "she vortexes the tube for 5 seconds" tells them much more than "she mixes it."</li>
+          <li><strong>Measurable values:</strong> any volumes, masses, concentrations, temperatures, durations, or speeds that are visible on screen, shown on a display, written on a label, or said out loud.</li>
+          <li><strong>Visible changes:</strong> color shifts, precipitation, bubbling, phase separation, dissolution, anything observable that signals something is happening.</li>
+          <li><strong>How things come together:</strong> how the tools and materials interact, e.g., "the tube is loaded into the centrifuge rotor and the lid is closed."</li>
         </ul>
-        <div class="instr-tip"><strong>Don't skip routine steps</strong> like attaching a pipette tip or capping a tube.</div>
+        <div class="instr-tip">
+          <strong>Don't skip routine steps</strong> like attaching a pipette tip or capping a tube. The student can't see them,
+          so to them they aren't routine, they're part of the procedure.
+        </div>
       </div>
 
       <div class="instr-section">
         <h2><span class="step-num">3</span> When You're Not Sure</h2>
+        <p>
+          Only describe what you can actually see in the video. Please <strong>don't fill things in</strong> from your own knowledge
+          of how the protocol "should" go, even if you're confident. We want the annotation to reflect the video, not the textbook.
+        </p>
+        <p style="margin-top:10px;">A few cases come up often:</p>
         <ul>
-          <li><strong>Parameter not visible:</strong> use <code>[Not Visible Parameter]</code></li>
+          <li><strong>A parameter would normally be specified, but the video doesn't show or state it.</strong>
+          Mark it as <code>[Not Visible Parameter]</code>.</li>
         </ul>
         <div class="instr-example">
           <strong>Example:</strong> "She centrifuges the tube for [Not Visible Parameter] at [Not Visible Parameter] rpm."
         </div>
         <ul>
-          <li><strong>Can't tell what's happening:</strong> use <code>[Unclear]</code> and describe what you see</li>
+          <li><strong>Something is happening but you can't quite tell what.</strong>
+          Mark it <code>[Unclear]</code> and describe what you can see.</li>
         </ul>
         <div class="instr-example">
           <strong>Example:</strong> "She adds [Unclear: appears to be a white powder] to the flask."
         </div>
         <ul>
-          <li><strong>Can't identify something:</strong> describe its observable properties instead of guessing</li>
+          <li><strong>You can't confidently identify a reagent or instrument.</strong>
+          Describe its observable properties instead of guessing the name.</li>
         </ul>
         <div class="instr-example">
           <strong>Example:</strong> Write "a clear colorless liquid in a glass vial" rather than naming a specific reagent you're unsure about.
@@ -776,10 +802,30 @@
 
       <div class="instr-section">
         <h2><span class="step-num">4</span> Output Format</h2>
+        <p>Please list steps in order within each segment. Use the following format:</p>
         <div class="instr-example">
+          <strong>Example:</strong><br/>
           <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
-          <strong>Step 2:</strong> She aspirates 20 &micro;L from a tube containing a clear colorless liquid and dispenses it into a second tube.<br/>
+          <strong>Step 2:</strong> She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
           <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+        </div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">5</span> How This Tool Works</h2>
+        <ol>
+          <li>Each video is split into <strong>30-second segments</strong>.</li>
+          <li>Watch a segment using the <strong>Play</strong> button.</li>
+          <li>Write your step-by-step description in the text box on the right.</li>
+          <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
+          <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
+          <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
+        </ol>
+        <div class="instr-tip">
+          <strong>Keyboard shortcuts:</strong>
+          <strong>Space</strong> = play/pause,
+          <strong>Left/Right arrows</strong> = previous/next segment.
+          Your progress is <strong>auto-saved</strong> in your browser. You can close the page and come back anytime.
         </div>
       </div>
 
