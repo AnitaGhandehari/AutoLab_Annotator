@@ -3,7 +3,7 @@
   "video": "extractdna_1",
   "video_label": "Extract DNA 1",
   "segment_duration_sec": 30,
-  "annotated_at": "2026-04-27T21:51:19.814Z",
+  "annotated_at": "2026-04-27T21:57:28.194Z",
   "segments": [
     {
       "segment": 1,
@@ -15,19 +15,19 @@
       "segment": 2,
       "start": "0:30",
       "end": "1:00",
-      "explanation": null
+      "explanation": "transfer media"
     },
     {
       "segment": 3,
       "start": "1:00",
       "end": "1:30",
-      "explanation": null
+      "explanation": "incubate"
     },
     {
       "segment": 4,
       "start": "1:30",
       "end": "2:00",
-      "explanation": null
+      "explanation": "centrifuge spin"
     },
     {
       "segment": 5,
