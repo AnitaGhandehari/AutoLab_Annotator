@@ -718,7 +718,52 @@
 
 <!-- =================== INSTRUCTIONS POPUP (from annotator) =================== -->
 <div class="instructions-modal-bg hidden" id="instrModal">
-  <div class="instructions-modal" id="instrModalContent">
+  <div class="instructions-modal">
+    <div class="instructions-header" style="border-radius:16px 16px 0 0;">
+      <h1>Annotation Instructions</h1>
+    </div>
+    <div class="instructions-body" style="padding-bottom:24px;">
+
+      <div class="instr-section">
+        <h2><span class="step-num">1</span> Your Task</h2>
+        <p>Assume you are explaining a video of a <strong>scientific experiment</strong> to a grad student with <strong>visual impairment</strong> who cannot see the scene, but needs to know the critical steps. Your explanation should be <strong>complete, structured, and sequential</strong>, as if you are narrating what is happening in real time.</p>
+        <div class="instr-tip"><strong>Why this matters:</strong> We will use your annotation to grade a Vision-Language Model (VLM) that is challenged with the same task, so the more informative and precise your description, the better.</div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">2</span> What to Include</h2>
+        <ul>
+          <li><strong>What is being used:</strong> instruments, containers, reagents, samples. Briefly describe new items (e.g., "a P200 micropipette").</li>
+          <li><strong>What is being done:</strong> use specific verbs like <em>pipettes, aspirates, dispenses, vortexes, inverts, centrifuges, weighs, dissolves, transfers</em>.</li>
+          <li><strong>Measurable values:</strong> volumes, masses, concentrations, temperatures, durations visible on screen.</li>
+          <li><strong>Visible changes:</strong> color shifts, precipitation, bubbling, phase separation, dissolution.</li>
+          <li><strong>How things come together:</strong> e.g., "the tube is loaded into the centrifuge rotor and the lid is closed."</li>
+        </ul>
+        <div class="instr-tip"><strong>Don't skip routine steps</strong> like attaching a pipette tip or capping a tube.</div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">3</span> When You're Not Sure</h2>
+        <ul>
+          <li>Parameter not visible: use <code>[Not Visible Parameter]</code></li>
+          <li>Can't tell what's happening: use <code>[Unclear]</code> and describe what you see</li>
+          <li>Can't identify something: describe its observable properties instead of guessing</li>
+        </ul>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">4</span> Output Format</h2>
+        <div class="instr-example">
+          <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
+          <strong>Step 2:</strong> She aspirates 20 &micro;L from a tube containing a clear colorless liquid and dispenses it into a second tube.<br/>
+          <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-close-bar">
+      <button id="btnCloseModal">Got it, back to annotating</button>
+    </div>
   </div>
 </div>
 
@@ -908,24 +953,11 @@ document.getElementById('btnViewInstructions').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
   vid.pause();
-  const modal = document.getElementById('instrModal');
-  const content = document.getElementById('instrModalContent');
-  if (!content.hasChildNodes()) {
-    const overlay = document.getElementById('instructionsOverlay');
-    const header = overlay.querySelector('.instructions-header').cloneNode(true);
-    const body = overlay.querySelector('.instructions-body').cloneNode(true);
-    body.style.paddingBottom = '24px';
-    const closeBar = document.createElement('div');
-    closeBar.className = 'modal-close-bar';
-    closeBar.innerHTML = '<button id="btnCloseModal">Got it, back to annotating</button>';
-    content.appendChild(header);
-    content.appendChild(body);
-    content.appendChild(closeBar);
-    document.getElementById('btnCloseModal').addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
-  }
-  modal.classList.remove('hidden');
+  document.getElementById('instrModal').classList.remove('hidden');
+});
+
+document.getElementById('btnCloseModal').addEventListener('click', () => {
+  document.getElementById('instrModal').classList.add('hidden');
 });
 
 document.getElementById('instrModal').addEventListener('click', (e) => {
