@@ -551,83 +551,94 @@
 <div class="instructions-overlay hidden" id="instructionsOverlay">
   <div class="instructions-header">
     <h1>Welcome to AutoLab Annotator</h1>
-    <p>Please read the following instructions carefully before you begin.</p>
+    <p>Thank you so much for your time to help us in this project! Please read the instructions below carefully before you begin.</p>
   </div>
 
   <div class="instructions-body">
 
     <div class="instr-section">
-      <h2><span class="step-num">1</span> Overview</h2>
+      <h2><span class="step-num">1</span> Your Task</h2>
       <p>
-        You will be watching short segments of biology lab experiment videos.
-        Your task is to describe <strong>what is happening</strong> in each segment
-        in clear, concise language that could help someone understand the procedure
-        without watching the video.
+        Assume you are explaining a video of a <strong>scientific experiment</strong> to a grad student
+        with <strong>visual impairment</strong> who cannot see the scene, but needs to know the critical steps.
+        You should describe everything in a way that allows the student to <strong>reconstruct the experiment</strong>.
       </p>
+      <p style="margin-top:10px;">
+        Your explanation should be <strong>complete, structured, and sequential</strong>, as if you are narrating
+        what is happening in real time.
+      </p>
+      <div class="instr-tip">
+        <strong>Why this matters:</strong> We will use your annotation to grade a Vision-Language Model (VLM) that is
+        challenged with the same task, so the more informative and precise your description, the better.
+      </div>
     </div>
 
     <div class="instr-section">
-      <h2><span class="step-num">2</span> How It Works</h2>
+      <h2><span class="step-num">2</span> What to Include in Each Step</h2>
+      <p>
+        Walk the student through the procedure the same way you'd walk them through it in person.
+        For every step, try to convey:
+      </p>
+      <ul>
+        <li><strong>What is being used:</strong> the instruments, containers, reagents, and samples involved. The first time something appears, briefly say what it is so the student can picture it (e.g., "a P200 micropipette," "a 1.5 mL microcentrifuge tube with a clear colorless liquid inside").</li>
+        <li><strong>What is being done:</strong> the action itself. Please use specific action verbs like <em>pipettes, aspirates, dispenses, vortexes, inverts, decants, centrifuges, weighs, dissolves, transfers, incubates</em>, rather than vague ones like <em>uses, puts,</em> or <em>does</em>. The student is relying on the verb to understand the motion, so "she vortexes the tube for 5 seconds" tells them much more than "she mixes it."</li>
+        <li><strong>Measurable values:</strong> any volumes, masses, concentrations, temperatures, durations, or speeds that are visible on screen, shown on a display, written on a label, or said out loud.</li>
+        <li><strong>Visible changes:</strong> color shifts, precipitation, bubbling, phase separation, dissolution — anything observable that signals something is happening.</li>
+        <li><strong>How things come together:</strong> how the tools and materials interact, e.g., "the tube is loaded into the centrifuge rotor and the lid is closed."</li>
+      </ul>
+      <div class="instr-tip">
+        <strong>Don't skip routine steps</strong> like attaching a pipette tip or capping a tube. The student can't see them,
+        so to them they aren't routine — they're part of the procedure.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">3</span> When You're Not Sure</h2>
+      <p>
+        Only describe what you can actually see in the video. Please <strong>don't fill things in</strong> from your own knowledge
+        of how the protocol "should" go, even if you're confident — we want the annotation to reflect the video, not the textbook.
+      </p>
+      <p style="margin-top:10px;">A few cases come up often:</p>
+      <ul>
+        <li><strong>A parameter would normally be specified, but the video doesn't show or state it.</strong>
+        Mark it as <code>[Not Visible Parameter]</code>.<br/>
+        <em>Example:</em> "She centrifuges the tube for [Not Visible Parameter] at [Not Visible Parameter] rpm."</li>
+        <li><strong>Something is happening but you can't quite tell what.</strong>
+        Mark it <code>[Unclear]</code> and describe what you can see.<br/>
+        <em>Example:</em> "She adds [Unclear: appears to be a white powder] to the flask."</li>
+        <li><strong>You can't confidently identify a reagent or instrument.</strong>
+        Describe its observable properties instead of guessing the name.<br/>
+        <em>Example:</em> Write "a clear colorless liquid in a glass vial" rather than naming a specific reagent you're unsure about.</li>
+      </ul>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">4</span> Output Format</h2>
+      <p>Please list steps in order within each segment. Use the following format:</p>
+      <div class="instr-example">
+        <strong>Example:</strong><br/>
+        <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
+        <strong>Step 2:</strong> She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
+        <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">5</span> How This Tool Works</h2>
       <ol>
         <li>Each video is split into <strong>30-second segments</strong>.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
-        <li>Write your description in the text box on the right.</li>
+        <li>Write your step-by-step description in the text box on the right.</li>
         <li>Click <strong>Save</strong> (or move to the next segment — it auto-saves).</li>
-        <li>Repeat for every segment in the video.</li>
+        <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
+        <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
       </ol>
       <div class="instr-tip">
-        <strong>Tip:</strong> Use the keyboard shortcuts —
-        <strong>Space</strong> to play/pause,
-        <strong>Left/Right arrows</strong> to navigate segments.
+        <strong>Keyboard shortcuts:</strong>
+        <strong>Space</strong> = play/pause,
+        <strong>Left/Right arrows</strong> = previous/next segment.
+        Your progress is <strong>auto-saved</strong> in your browser — you can close the page and come back anytime.
       </div>
-    </div>
-
-    <div class="instr-section">
-      <h2><span class="step-num">3</span> What to Write</h2>
-      <p>For each segment, describe:</p>
-      <ul>
-        <li>What <strong>action</strong> is being performed (e.g. pipetting, mixing, loading a gel).</li>
-        <li>What <strong>equipment or materials</strong> are visible.</li>
-        <li>Any <strong>changes</strong> that occur (e.g. color change, gel running).</li>
-        <li>The <strong>stage of the experiment</strong> if recognizable.</li>
-      </ul>
-      <div class="instr-example">
-        <strong>Example:</strong> "The researcher uses a micropipette to load a blue-dyed DNA sample
-        into the wells of an agarose gel. The gel box is connected to a power supply. Three wells
-        have already been loaded."
-      </div>
-    </div>
-
-    <div class="instr-section">
-      <h2><span class="step-num">4</span> Multiple Videos</h2>
-      <p>
-        There may be more than one video to annotate. Use the <strong>Video</strong> dropdown
-        at the top of the annotator to switch between them. Your progress is saved
-        separately for each video.
-      </p>
-    </div>
-
-    <div class="instr-section">
-      <h2><span class="step-num">5</span> Saving &amp; Exporting</h2>
-      <p>
-        Your annotations are <strong>automatically saved</strong> in your browser as you work.
-        You can close the page and come back later — your progress will still be there
-        (as long as you use the same browser and enter the same name).
-      </p>
-      <p style="margin-top:8px;">
-        When you finish annotating a video, click the <strong>Export JSON</strong> button
-        to download your annotations as a file. Please send this file to the project lead.
-      </p>
-    </div>
-
-    <div class="instr-section">
-      <h2><span class="step-num">6</span> Important Notes</h2>
-      <ul>
-        <li>Write in <strong>English</strong>.</li>
-        <li>Be specific — avoid vague descriptions like "something is happening."</li>
-        <li>If a segment shows nothing meaningful (e.g. a black screen or transition), you can write "No visible activity" and move on.</li>
-        <li>There is no time limit — take as long as you need.</li>
-      </ul>
     </div>
 
   </div>
