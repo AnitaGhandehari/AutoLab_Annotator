@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Video Annotator — BioVL-QR</title>
+  <title>AutoLab Annotator</title>
   <style>
     :root {
       --primary: #4f46e5;
@@ -400,8 +400,8 @@
 <!-- =================== LOGIN SCREEN =================== -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
-    <h1>Video Annotator</h1>
-    <p>BioVL-QR Project — Enter your name to begin annotating.</p>
+    <h1>AutoLab Annotator</h1>
+    <p>Enter your name to begin annotating.</p>
     <label for="firstName">First Name</label>
     <input type="text" id="firstName" placeholder="e.g. Jane" autocomplete="given-name" />
     <label for="lastName">Last Name</label>
@@ -413,7 +413,7 @@
 
 <!-- =================== MAIN APP =================== -->
 <header>
-  <h1>Video Annotator</h1>
+  <h1>AutoLab Annotator</h1>
   <span class="badge" id="videoBadge">—</span>
   <span class="badge" id="totalSegments"></span>
   <div class="header-spacer"></div>
@@ -508,10 +508,10 @@ let currentUser  = null; // { first, last }
 
 /* ================================================================
    LOCAL STORAGE — all annotations stored per-user per-video
-   Key format: "biovl_<first>_<last>_<videoId>"
+   Key format: "autolab_<first>_<last>_<videoId>"
    ================================================================ */
 function storageKey(videoId) {
-  return `biovl_${currentUser.first}_${currentUser.last}_${videoId || currentVideoId}`;
+  return `autolab_${currentUser.first}_${currentUser.last}_${videoId || currentVideoId}`;
 }
 
 function saveAnnotationsLocal() {
@@ -547,7 +547,7 @@ function flash(msg) {
    LOGIN
    ================================================================ */
 function checkExistingSession() {
-  const saved = localStorage.getItem('biovl_user');
+  const saved = localStorage.getItem('autolab_user');
   if (saved) {
     currentUser = JSON.parse(saved);
     enterApp();
@@ -565,7 +565,7 @@ document.getElementById('loginBtn').addEventListener('click', () => {
   }
 
   currentUser = { first, last };
-  localStorage.setItem('biovl_user', JSON.stringify(currentUser));
+  localStorage.setItem('autolab_user', JSON.stringify(currentUser));
   enterApp();
 });
 
@@ -579,7 +579,7 @@ document.getElementById('lastName').addEventListener('keydown', e => {
 document.getElementById('btnLogout').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
-  localStorage.removeItem('biovl_user');
+  localStorage.removeItem('autolab_user');
   currentUser = null;
   document.getElementById('loginOverlay').classList.remove('hidden');
 });

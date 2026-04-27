@@ -1,4 +1,4 @@
-# BioVL-QR Video Annotator
+# AutoLab Annotator
 
 A static web app for annotating biology experiment videos. Hosted on GitHub Pages — no server required.
 
@@ -12,7 +12,7 @@ A static web app for annotating biology experiment videos. Hosted on GitHub Page
 
 ## Deploy to GitHub Pages
 
-1. Create a new GitHub repository (e.g. `biovl-annotator`)
+1. Create a new GitHub repository (e.g. `AutoLab_Annotator`)
 
 2. Push this folder to the repo:
    ```bash
@@ -21,7 +21,7 @@ A static web app for annotating biology experiment videos. Hosted on GitHub Page
    git add .
    git commit -m "Initial annotator deploy"
    git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/biovl-annotator.git
+   git remote add origin https://github.com/YOUR_USERNAME/AutoLab_Annotator.git
    git push -u origin main
    ```
 
@@ -33,7 +33,7 @@ A static web app for annotating biology experiment videos. Hosted on GitHub Page
 
 4. After a minute, your site will be live at:
    ```
-   https://YOUR_USERNAME.github.io/biovl-annotator/
+   https://YOUR_USERNAME.github.io/AutoLab_Annotator/
    ```
 
 5. Share that link with your annotators.
