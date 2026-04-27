@@ -416,6 +416,55 @@
     }
     .instructions-overlay.hidden { display: none; }
 
+    /* ---- Instructions modal (popup from annotator) ---- */
+    .instructions-modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .instructions-modal-bg.hidden { display: none; }
+    .instructions-modal {
+      background: var(--bg);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    }
+    .instructions-modal .instructions-header {
+      border-radius: 16px 16px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .modal-close-bar {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: center;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      border-radius: 0 0 16px 16px;
+    }
+    .modal-close-bar button {
+      padding: 10px 36px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-close-bar button:hover { background: var(--primary-hover); }
+
     .instructions-header {
       background: var(--primary);
       color: white;
@@ -667,6 +716,12 @@
   </div>
 </div>
 
+<!-- =================== INSTRUCTIONS POPUP (from annotator) =================== -->
+<div class="instructions-modal-bg hidden" id="instrModal">
+  <div class="instructions-modal" id="instrModalContent">
+  </div>
+</div>
+
 <!-- =================== MAIN APP =================== -->
 <header>
   <h1>AutoLab Annotator</h1>
@@ -717,7 +772,7 @@
       <div class="card-actions">
         <button class="btn-accent" id="btnSave">Save</button>
         <button class="btn-outline" id="btnClear">Clear</button>
-        <button class="btn-outline" id="btnExport">Export JSON</button>
+        <button class="btn-primary" id="btnExport">Export JSON</button>
       </div>
       <button class="btn-done" id="btnDone">Done. Submit Annotations</button>
     </div>
@@ -853,8 +908,30 @@ document.getElementById('btnViewInstructions').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
   vid.pause();
-  document.getElementById('instructionsOverlay').classList.remove('hidden');
-  document.getElementById('instrFooter').classList.remove('hidden');
+  const modal = document.getElementById('instrModal');
+  const content = document.getElementById('instrModalContent');
+  if (!content.hasChildNodes()) {
+    const overlay = document.getElementById('instructionsOverlay');
+    const header = overlay.querySelector('.instructions-header').cloneNode(true);
+    const body = overlay.querySelector('.instructions-body').cloneNode(true);
+    body.style.paddingBottom = '24px';
+    const closeBar = document.createElement('div');
+    closeBar.className = 'modal-close-bar';
+    closeBar.innerHTML = '<button id="btnCloseModal">Got it, back to annotating</button>';
+    content.appendChild(header);
+    content.appendChild(body);
+    content.appendChild(closeBar);
+    document.getElementById('btnCloseModal').addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+  }
+  modal.classList.remove('hidden');
+});
+
+document.getElementById('instrModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('instrModal')) {
+    document.getElementById('instrModal').classList.add('hidden');
+  }
 });
 
 function showInstructions() {
