@@ -914,7 +914,12 @@ function checkExistingSession() {
   const saved = localStorage.getItem('autolab_user');
   if (saved) {
     currentUser = JSON.parse(saved);
-    showInstructions();
+    if (localStorage.getItem('autolab_instructions_seen')) {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      enterApp();
+    } else {
+      showInstructions();
+    }
   }
 }
 
@@ -944,6 +949,7 @@ document.getElementById('btnLogout').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
   localStorage.removeItem('autolab_user');
+  localStorage.removeItem('autolab_instructions_seen');
   currentUser = null;
   document.getElementById('loginOverlay').classList.remove('hidden');
   document.getElementById('instructionsOverlay').classList.add('hidden');
@@ -976,6 +982,7 @@ function showInstructions() {
 document.getElementById('btnStartAnnotating').addEventListener('click', () => {
   document.getElementById('instructionsOverlay').classList.add('hidden');
   document.getElementById('instrFooter').classList.add('hidden');
+  localStorage.setItem('autolab_instructions_seen', 'true');
   enterApp();
 });
 
