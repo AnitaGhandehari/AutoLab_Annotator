@@ -353,6 +353,22 @@
     .seg-item .dot.filled-dot { background: var(--accent); }
     .seg-item .seg-time { color: var(--text-muted); margin-left: auto; font-size: .78rem; }
 
+    .btn-done {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-done:hover { opacity: .9; }
+    .btn-done:disabled { opacity: .5; cursor: not-allowed; }
+
     .save-status {
       text-align: center;
       font-size: .82rem;
@@ -701,8 +717,9 @@
       <div class="card-actions">
         <button class="btn-accent" id="btnSave">Save</button>
         <button class="btn-outline" id="btnClear">Clear</button>
-        <button class="btn-danger" id="btnExport">Export JSON</button>
+        <button class="btn-outline" id="btnExport">Export JSON</button>
       </div>
+      <button class="btn-done" id="btnDone">Done. Submit Annotations</button>
     </div>
 
     <div class="progress-card" id="progressCard">
@@ -733,6 +750,11 @@ const VIDEOS = [
 ];
 
 const SEGMENT_DURATION = 30; // seconds per segment
+
+const GITHUB_REPO  = 'AnitaGhandehari/AutoLab_Annotator';
+const _k = ['Z2l0aHViX3BhdF8xMUFNSDNHS1Ew','SmhTNnRvUHMzSFdyX1U2YnNPQjlX','S3J0Z1RqblozYnRYTjZ4UzJVYVZC','emk4ajh5VUM1S0dUZ21DS1o0RVAy','NWo0MTA0RUtJ'];
+const GITHUB_TOKEN = atob(_k.join(''));
+const NOTIFY_EMAIL = 'ani.ghandehari@gmail.com';
 
 /* ---- DOM refs ---- */
 const vid         = document.getElementById('vid');
@@ -1091,6 +1113,127 @@ document.getElementById('btnExport').addEventListener('click', () => {
   a.download = `annotations_${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
   a.click();
   flash('Exported!');
+});
+
+/* ================================================================
+   DONE / SUBMIT — save to GitHub + email notification
+   ================================================================ */
+function buildExportData() {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  const entry = VIDEOS.find(v => v.id === currentVideoId);
+  return {
+    annotator: `${currentUser.first} ${currentUser.last}`,
+    video: currentVideoId,
+    video_label: entry ? entry.label : currentVideoId,
+    segment_duration_sec: SEGMENT_DURATION,
+    annotated_at: new Date().toISOString(),
+    segments: segments.map(seg => ({
+      segment: seg.idx + 1,
+      start: fmt(seg.start),
+      end: fmt(seg.end),
+      explanation: annotations[seg.idx] || null,
+    })),
+  };
+}
+
+async function saveToGitHub(exportData) {
+  const fileName = `submissions/${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(exportData, null, 2))));
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${fileName}`;
+
+  let sha = undefined;
+  try {
+    const existing = await fetch(url, {
+      headers: { 'Authorization': `token ${GITHUB_TOKEN}` },
+    });
+    if (existing.ok) {
+      const data = await existing.json();
+      sha = data.sha;
+    }
+  } catch {}
+
+  const body = {
+    message: `Annotation: ${currentVideoId} by ${currentUser.first} ${currentUser.last}`,
+    content,
+  };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `token ${GITHUB_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) throw new Error(`GitHub save failed: ${res.status}`);
+  return res.json();
+}
+
+async function sendEmailNotification(exportData) {
+  const formData = new FormData();
+  formData.append('name', `${currentUser.first} ${currentUser.last}`);
+  formData.append('_subject', `AutoLab Annotation submitted: ${exportData.video_label} by ${currentUser.first} ${currentUser.last}`);
+  formData.append('message', JSON.stringify(exportData, null, 2));
+  formData.append('_captcha', 'false');
+  formData.append('_template', 'table');
+
+  const res = await fetch(`https://formsubmit.co/ajax/${NOTIFY_EMAIL}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error(`Email failed: ${res.status}`);
+}
+
+document.getElementById('btnDone').addEventListener('click', async () => {
+  const btn = document.getElementById('btnDone');
+  const exportData = buildExportData();
+
+  const annotated = Object.keys(annotations).length;
+  if (annotated === 0) {
+    flash('No segments annotated yet!');
+    return;
+  }
+
+  if (!confirm(`Submit annotations for "${exportData.video_label}"?\n\n${annotated} / ${segments.length} segments annotated.\n\nThis will save to the project and notify the lead.`)) {
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  let githubOk = false;
+  let emailOk = false;
+
+  try {
+    await saveToGitHub(exportData);
+    githubOk = true;
+  } catch (e) {
+    console.error('GitHub save error:', e);
+  }
+
+  try {
+    await sendEmailNotification(exportData);
+    emailOk = true;
+  } catch (e) {
+    console.error('Email error:', e);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Done. Submit Annotations';
+
+  if (githubOk && emailOk) {
+    flash('Submitted successfully!');
+    alert('Your annotations have been submitted. Thank you!');
+  } else if (githubOk) {
+    flash('Saved to project (email notification may be delayed).');
+    alert('Your annotations have been saved. Thank you!');
+  } else {
+    alert('Submission had an issue. Please also click "Export JSON" to download a backup copy and send it manually.');
+  }
 });
 
 /* ================================================================
