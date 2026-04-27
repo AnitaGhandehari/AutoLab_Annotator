@@ -656,6 +656,7 @@
   <span class="badge" id="totalSegments"></span>
   <div class="header-spacer"></div>
   <div class="user-info">
+    <button class="btn-logout" id="btnViewInstructions">Instructions</button>
     <span class="user-name" id="userDisplay"></span>
     <button class="btn-logout" id="btnLogout">Log out</button>
   </div>
@@ -822,6 +823,14 @@ document.getElementById('btnLogout').addEventListener('click', () => {
   document.getElementById('loginOverlay').classList.remove('hidden');
   document.getElementById('instructionsOverlay').classList.add('hidden');
   document.getElementById('instrFooter').classList.add('hidden');
+});
+
+document.getElementById('btnViewInstructions').addEventListener('click', () => {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  vid.pause();
+  document.getElementById('instructionsOverlay').classList.remove('hidden');
+  document.getElementById('instrFooter').classList.remove('hidden');
 });
 
 function showInstructions() {
