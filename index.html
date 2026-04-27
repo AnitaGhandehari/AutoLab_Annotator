@@ -390,6 +390,142 @@
       color: var(--text-muted);
     }
 
+    /* ---- Instructions overlay ---- */
+    .instructions-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 900;
+      overflow-y: auto;
+    }
+    .instructions-overlay.hidden { display: none; }
+
+    .instructions-header {
+      background: var(--primary);
+      color: white;
+      padding: 24px 28px;
+      text-align: center;
+    }
+    .instructions-header h1 { font-size: 1.5rem; font-weight: 700; }
+    .instructions-header p { opacity: .85; font-size: .92rem; margin-top: 4px; }
+
+    .instructions-body {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 32px 28px 120px;
+    }
+
+    .instr-section {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .instr-section h2 {
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .instr-section h2 .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: .85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .instr-section p,
+    .instr-section li {
+      color: var(--text);
+      font-size: .92rem;
+      line-height: 1.7;
+    }
+    .instr-section ul,
+    .instr-section ol {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+    .instr-section li { margin-bottom: 6px; }
+
+    .instr-tip {
+      background: #eef2ff;
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 14px;
+      font-size: .88rem;
+      color: var(--text);
+    }
+    .instr-tip strong { color: var(--primary); }
+
+    .instr-example {
+      background: #f0fdf4;
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 14px;
+      font-size: .88rem;
+      color: var(--text);
+    }
+    .instr-example strong { color: #059669; }
+
+    .instr-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      z-index: 901;
+    }
+    .instr-footer.hidden { display: none; }
+    .instr-footer button {
+      padding: 12px 40px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-start {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-start:hover { background: var(--primary-hover); }
+
+    .instr-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .instr-progress .dot-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    .instr-progress .dot-indicator.current {
+      background: var(--primary);
+      width: 28px;
+      border-radius: 5px;
+    }
+
     @media (max-width: 860px) {
       .container { grid-template-columns: 1fr; }
     }
@@ -408,6 +544,96 @@
     <input type="text" id="lastName" placeholder="e.g. Smith" autocomplete="family-name" />
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" id="loginBtn">Start Annotating</button>
+  </div>
+</div>
+
+<!-- =================== INSTRUCTIONS SCREEN =================== -->
+<div class="instructions-overlay hidden" id="instructionsOverlay">
+  <div class="instructions-header">
+    <h1>Welcome to AutoLab Annotator</h1>
+    <p>Please read the following instructions carefully before you begin.</p>
+  </div>
+
+  <div class="instructions-body">
+
+    <div class="instr-section">
+      <h2><span class="step-num">1</span> Overview</h2>
+      <p>
+        You will be watching short segments of biology lab experiment videos.
+        Your task is to describe <strong>what is happening</strong> in each segment
+        in clear, concise language that could help someone understand the procedure
+        without watching the video.
+      </p>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">2</span> How It Works</h2>
+      <ol>
+        <li>Each video is split into <strong>30-second segments</strong>.</li>
+        <li>Watch a segment using the <strong>Play</strong> button.</li>
+        <li>Write your description in the text box on the right.</li>
+        <li>Click <strong>Save</strong> (or move to the next segment — it auto-saves).</li>
+        <li>Repeat for every segment in the video.</li>
+      </ol>
+      <div class="instr-tip">
+        <strong>Tip:</strong> Use the keyboard shortcuts —
+        <strong>Space</strong> to play/pause,
+        <strong>Left/Right arrows</strong> to navigate segments.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">3</span> What to Write</h2>
+      <p>For each segment, describe:</p>
+      <ul>
+        <li>What <strong>action</strong> is being performed (e.g. pipetting, mixing, loading a gel).</li>
+        <li>What <strong>equipment or materials</strong> are visible.</li>
+        <li>Any <strong>changes</strong> that occur (e.g. color change, gel running).</li>
+        <li>The <strong>stage of the experiment</strong> if recognizable.</li>
+      </ul>
+      <div class="instr-example">
+        <strong>Example:</strong> "The researcher uses a micropipette to load a blue-dyed DNA sample
+        into the wells of an agarose gel. The gel box is connected to a power supply. Three wells
+        have already been loaded."
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">4</span> Multiple Videos</h2>
+      <p>
+        There may be more than one video to annotate. Use the <strong>Video</strong> dropdown
+        at the top of the annotator to switch between them. Your progress is saved
+        separately for each video.
+      </p>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">5</span> Saving &amp; Exporting</h2>
+      <p>
+        Your annotations are <strong>automatically saved</strong> in your browser as you work.
+        You can close the page and come back later — your progress will still be there
+        (as long as you use the same browser and enter the same name).
+      </p>
+      <p style="margin-top:8px;">
+        When you finish annotating a video, click the <strong>Export JSON</strong> button
+        to download your annotations as a file. Please send this file to the project lead.
+      </p>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">6</span> Important Notes</h2>
+      <ul>
+        <li>Write in <strong>English</strong>.</li>
+        <li>Be specific — avoid vague descriptions like "something is happening."</li>
+        <li>If a segment shows nothing meaningful (e.g. a black screen or transition), you can write "No visible activity" and move on.</li>
+        <li>There is no time limit — take as long as you need.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="instr-footer" id="instrFooter">
+    <button class="btn-start" id="btnStartAnnotating">I've read the instructions — Start Annotating</button>
   </div>
 </div>
 
@@ -550,7 +776,7 @@ function checkExistingSession() {
   const saved = localStorage.getItem('autolab_user');
   if (saved) {
     currentUser = JSON.parse(saved);
-    enterApp();
+    showInstructions();
   }
 }
 
@@ -566,7 +792,7 @@ document.getElementById('loginBtn').addEventListener('click', () => {
 
   currentUser = { first, last };
   localStorage.setItem('autolab_user', JSON.stringify(currentUser));
-  enterApp();
+  showInstructions();
 });
 
 document.getElementById('firstName').addEventListener('keydown', e => {
@@ -582,10 +808,23 @@ document.getElementById('btnLogout').addEventListener('click', () => {
   localStorage.removeItem('autolab_user');
   currentUser = null;
   document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('instructionsOverlay').classList.add('hidden');
+  document.getElementById('instrFooter').classList.add('hidden');
+});
+
+function showInstructions() {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('instructionsOverlay').classList.remove('hidden');
+  document.getElementById('instrFooter').classList.remove('hidden');
+}
+
+document.getElementById('btnStartAnnotating').addEventListener('click', () => {
+  document.getElementById('instructionsOverlay').classList.add('hidden');
+  document.getElementById('instrFooter').classList.add('hidden');
+  enterApp();
 });
 
 function enterApp() {
-  document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('userDisplay').textContent = `${currentUser.first} ${currentUser.last}`;
   populateVideoList();
 }
