@@ -1,0 +1,45 @@
+{
+  "annotator": "Zoe Piran",
+  "video": "extractdna_1",
+  "video_label": "Extract DNA 1",
+  "segment_duration_sec": 30,
+  "annotated_at": "2026-04-27T21:51:19.814Z",
+  "segments": [
+    {
+      "segment": 1,
+      "start": "0:00",
+      "end": "0:30",
+      "explanation": "the scientist is pouring an extract to the tube"
+    },
+    {
+      "segment": 2,
+      "start": "0:30",
+      "end": "1:00",
+      "explanation": null
+    },
+    {
+      "segment": 3,
+      "start": "1:00",
+      "end": "1:30",
+      "explanation": null
+    },
+    {
+      "segment": 4,
+      "start": "1:30",
+      "end": "2:00",
+      "explanation": null
+    },
+    {
+      "segment": 5,
+      "start": "2:00",
+      "end": "2:30",
+      "explanation": null
+    },
+    {
+      "segment": 6,
+      "start": "2:30",
+      "end": "2:30",
+      "explanation": null
+    }
+  ]
+}
