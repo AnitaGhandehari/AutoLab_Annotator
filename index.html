@@ -1173,12 +1173,32 @@ async function saveToGitHub(exportData) {
 }
 
 async function sendEmailNotification(exportData) {
+  const fileName = `${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  const githubFileUrl = `https://github.com/${GITHUB_REPO}/blob/main/submissions/${fileName}`;
+  const rawFileUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/submissions/${fileName}`;
+  const annotatedCount = exportData.segments.filter(s => s.explanation !== null).length;
+  const totalCount = exportData.segments.length;
+
+  const emailBody = [
+    `Annotator: ${exportData.annotator}`,
+    `Video: ${exportData.video_label} (${exportData.video})`,
+    `Segments annotated: ${annotatedCount} / ${totalCount}`,
+    `Submitted at: ${exportData.annotated_at}`,
+    ``,
+    `Download JSON file: ${rawFileUrl}`,
+    `View on GitHub: ${githubFileUrl}`,
+    ``,
+    `--- Full Annotation JSON ---`,
+    ``,
+    JSON.stringify(exportData, null, 2),
+  ].join('\n');
+
   const formData = new FormData();
   formData.append('name', `${currentUser.first} ${currentUser.last}`);
-  formData.append('_subject', `AutoLab Annotation submitted: ${exportData.video_label} by ${currentUser.first} ${currentUser.last}`);
-  formData.append('message', JSON.stringify(exportData, null, 2));
+  formData.append('_subject', `[AutoLab] ${exportData.video_label} annotated by ${currentUser.first} ${currentUser.last} (${annotatedCount}/${totalCount} segments)`);
+  formData.append('message', emailBody);
   formData.append('_captcha', 'false');
-  formData.append('_template', 'table');
+  formData.append('_template', 'box');
 
   const res = await fetch(`https://formsubmit.co/ajax/${NOTIFY_EMAIL}`, {
     method: 'POST',
