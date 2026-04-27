@@ -1,0 +1,111 @@
+{
+  "annotator": "Anita Ghandehari",
+  "video": "electrophoresis_1",
+  "video_label": "Electrophoresis 1",
+  "segment_duration_sec": 30,
+  "annotated_at": "2026-04-27T20:41:44.498Z",
+  "segments": [
+    {
+      "segment": 1,
+      "start": "0:00",
+      "end": "0:30",
+      "explanation": "123"
+    },
+    {
+      "segment": 2,
+      "start": "0:30",
+      "end": "1:00",
+      "explanation": null
+    },
+    {
+      "segment": 3,
+      "start": "1:00",
+      "end": "1:30",
+      "explanation": null
+    },
+    {
+      "segment": 4,
+      "start": "1:30",
+      "end": "2:00",
+      "explanation": null
+    },
+    {
+      "segment": 5,
+      "start": "2:00",
+      "end": "2:30",
+      "explanation": null
+    },
+    {
+      "segment": 6,
+      "start": "2:30",
+      "end": "3:00",
+      "explanation": null
+    },
+    {
+      "segment": 7,
+      "start": "3:00",
+      "end": "3:30",
+      "explanation": null
+    },
+    {
+      "segment": 8,
+      "start": "3:30",
+      "end": "4:00",
+      "explanation": null
+    },
+    {
+      "segment": 9,
+      "start": "4:00",
+      "end": "4:30",
+      "explanation": null
+    },
+    {
+      "segment": 10,
+      "start": "4:30",
+      "end": "5:00",
+      "explanation": null
+    },
+    {
+      "segment": 11,
+      "start": "5:00",
+      "end": "5:30",
+      "explanation": null
+    },
+    {
+      "segment": 12,
+      "start": "5:30",
+      "end": "6:00",
+      "explanation": null
+    },
+    {
+      "segment": 13,
+      "start": "6:00",
+      "end": "6:30",
+      "explanation": null
+    },
+    {
+      "segment": 14,
+      "start": "6:30",
+      "end": "7:00",
+      "explanation": null
+    },
+    {
+      "segment": 15,
+      "start": "7:00",
+      "end": "7:30",
+      "explanation": null
+    },
+    {
+      "segment": 16,
+      "start": "7:30",
+      "end": "8:00",
+      "explanation": null
+    },
+    {
+      "segment": 17,
+      "start": "8:00",
+      "end": "8:03",
+      "explanation": null
+    }
+  ]
+}
