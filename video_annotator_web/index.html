@@ -8,6 +8,8 @@
     :root {
       --primary: #4f46e5;
       --primary-hover: #4338ca;
+      --extra-note: #0d9488;
+      --extra-note-hover: #0f766e;
       --bg: #f8fafc;
       --card: #ffffff;
       --border: #e2e8f0;
@@ -196,6 +198,14 @@
     .btn-accent:hover { background: #059669; }
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-danger:hover { background: #dc2626; }
+    .btn-extra-note {
+      background: var(--extra-note);
+      color: #fff;
+    }
+    .btn-extra-note:hover {
+      background: var(--extra-note-hover);
+      color: #fff;
+    }
 
     .segment-indicator {
       margin-left: auto;
@@ -451,6 +461,23 @@
       overflow-y: auto;
       box-shadow: 0 25px 60px rgba(0,0,0,.3);
     }
+    .extra-note-modal-header {
+      background: linear-gradient(135deg, var(--extra-note) 0%, #0f766e 100%);
+      color: #fff;
+      padding: 18px 24px;
+      border-radius: 16px 16px 0 0;
+      text-align: center;
+    }
+    .extra-note-modal-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .extra-note-modal-header p {
+      opacity: 0.95;
+      font-size: 0.88rem;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
     .extra-note-modal-inner {
       padding: 8px 24px 20px;
     }
@@ -471,7 +498,8 @@
     }
     .extra-note-modal textarea.ann-input:focus {
       outline: none;
-      border-color: var(--primary);
+      border-color: var(--extra-note);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.22);
     }
     .extra-note-modal-time {
       font-size: .9rem;
@@ -479,7 +507,7 @@
       margin-bottom: 12px;
     }
     .extra-note-modal-time strong {
-      color: var(--primary);
+      color: var(--extra-note);
       font-variant-numeric: tabular-nums;
     }
     .extra-note-modal-actions {
@@ -487,6 +515,13 @@
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 12px;
+    }
+    .extra-note-modal-actions button {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
     }
     .extra-note-modal-list-title {
       font-size: .82rem;
@@ -508,7 +543,7 @@
       flex: 0 0 auto;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-      color: var(--primary);
+      color: var(--extra-note);
     }
     .extra-note-modal .keypoint-text {
       flex: 1;
@@ -892,9 +927,24 @@
 
     <div class="instr-section">
       <h2><span class="step-num">4</span> Output Format</h2>
-      <p>Please list steps in order within each segment. In each <strong>Step</strong> box we suggest stating the <strong>time range</strong> within that segment and the <strong>moment (second or mm:ss)</strong> when each action happens, then what occurs.</p>
+      <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the five panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
+      <ul>
+        <li><strong>equipment</strong> — apparatus and instruments you see.</li>
+        <li><strong>materials</strong> — consumables, reagents, tubes, samples.</li>
+        <li><strong>actions</strong> — what the person does; prefer specific verbs.</li>
+        <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it.</li>
+        <li><strong>visualized_results</strong> — observable outcomes (color, bands, precipitate, phases).</li>
+      </ul>
+      <p><strong>Optional <code>Extra_Notes</code> (teal button):</strong> Click <strong>Extra note</strong> next to <strong>Replay</strong> at the exact moment you care about. A popup opens; the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
+      <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
+      <ul>
+        <li><code>[Not visible]</code> — this field might apply, but you cannot clearly see the relevant detail on screen.</li>
+        <li><code>N/A</code> — this field does not apply to this segment.</li>
+        <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. Common in <strong>Actions</strong> (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
+      </ul>
+      <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
       <div class="instr-example">
-        <strong>Example:</strong><br/>
+        <strong>Step formatting example:</strong><br/>
         <strong>Step 1:</strong> 0:00–0:08: She attaches a disposable tip to a P200 micropipette.<br/>
         <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
         <strong>Step 3:</strong> 0:22–0:26: She caps the receiving tube and inverts it three times to mix.
@@ -907,7 +957,7 @@
         <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
         <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
-        <li>Optional: click <strong>Extra note</strong> next to <strong>Replay</strong> at the exact frame you care about; type the note in the popup. It is stored under <code>Extra_Notes</code> (by <code>mm:ss</code>) for that segment in the export.</li>
+        <li>Optional: the teal <strong>Extra note</strong> button next to <strong>Replay</strong> saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
         <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
@@ -1003,9 +1053,24 @@
 
       <div class="instr-section">
         <h2><span class="step-num">4</span> Output Format</h2>
-        <p>Please list steps in order within each segment. In each <strong>Step</strong> box we suggest stating the <strong>time range</strong> within that segment and the <strong>moment (second or mm:ss)</strong> when each action happens, then what occurs.</p>
+        <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the five panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
+        <ul>
+          <li><strong>equipment</strong> — apparatus and instruments you see.</li>
+          <li><strong>materials</strong> — consumables, reagents, tubes, samples.</li>
+          <li><strong>actions</strong> — what the person does; prefer specific verbs.</li>
+          <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it.</li>
+          <li><strong>visualized_results</strong> — observable outcomes (color, bands, precipitate, phases).</li>
+        </ul>
+        <p><strong>Optional <code>Extra_Notes</code> (teal button):</strong> Click <strong>Extra note</strong> next to <strong>Replay</strong> at the exact moment you care about. A popup opens; the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
+        <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
+        <ul>
+          <li><code>[Not visible]</code> — this field might apply, but you cannot clearly see the relevant detail on screen.</li>
+          <li><code>N/A</code> — this field does not apply to this segment.</li>
+          <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. Common in <strong>Actions</strong> (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
+        </ul>
+        <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
         <div class="instr-example">
-          <strong>Example:</strong><br/>
+          <strong>Step formatting example:</strong><br/>
           <strong>Step 1:</strong> 0:00–0:08: She attaches a disposable tip to a P200 micropipette.<br/>
           <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
           <strong>Step 3:</strong> 0:22–0:26: She caps the receiving tube and inverts it three times to mix.
@@ -1018,7 +1083,7 @@
           <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
           <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
-          <li>Optional: click <strong>Extra note</strong> next to <strong>Replay</strong> at the exact frame you care about; type the note in the popup. It is stored under <code>Extra_Notes</code> (by <code>mm:ss</code>) for that segment in the export.</li>
+          <li>Optional: the teal <strong>Extra note</strong> button next to <strong>Replay</strong> saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
           <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
@@ -1040,15 +1105,15 @@
 
 <div class="instructions-modal-bg hidden" id="extraNoteModalBg" aria-hidden="true">
   <div class="extra-note-modal" id="extraNoteModalPanel" role="dialog" aria-modal="true" aria-labelledby="extraNoteModalTitle">
-    <div class="instructions-header" style="padding: 18px 24px;">
-      <h2 id="extraNoteModalTitle" style="font-size:1.2rem;">Extra note</h2>
-      <p style="opacity:.9; font-size:.88rem; margin-top:4px;">The note is saved at the video time shown below (the time when you opened this window).</p>
+    <div class="extra-note-modal-header">
+      <h2 id="extraNoteModalTitle">Extra note</h2>
+      <p>The note is saved at the video time shown below (the time when you opened this window).</p>
     </div>
     <div class="extra-note-modal-inner">
       <p class="extra-note-modal-time">Time in video: <strong id="extraNoteModalTimeLabel">0:00</strong></p>
       <textarea id="extraNoteModalInput" class="ann-input" rows="4" placeholder="Type the extra information for this moment…" aria-label="Extra note text"></textarea>
       <div class="extra-note-modal-actions">
-        <button type="button" class="btn-primary" id="btnExtraNoteSave">Save note</button>
+        <button type="button" class="btn-extra-note" id="btnExtraNoteSave">Save note</button>
         <button type="button" class="btn-outline" id="btnExtraNoteCancel">Close</button>
       </div>
       <div class="extra-note-modal-list-title">Notes for this segment (exported as Extra_Notes)</div>
@@ -1100,7 +1165,7 @@
         <button class="btn-primary" id="btnPlay">Play</button>
         <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
         <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
-        <button class="btn-outline" id="btnExtraNote" title="Add an extra note at the current playback time">Extra note</button>
+        <button class="btn-extra-note" id="btnExtraNote" title="Add an extra note at the current playback time">Extra note</button>
         <span class="segment-indicator" id="segLabel">Segment 1 / ...</span>
       </div>
     </div>
