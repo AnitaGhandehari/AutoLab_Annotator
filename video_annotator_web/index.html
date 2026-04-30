@@ -995,17 +995,17 @@
       <p style="margin-top:10px;">A few cases come up often:</p>
       <ul>
         <li><strong>A parameter would normally be specified, but the video doesn't show or state it.</strong>
-        Mark it as <code>[Not Visible Parameter]</code>.</li>
+        Mark it as <code>[Not Visible Parameter]</code> where that value would appear in the sentence.</li>
       </ul>
       <div class="instr-example">
         <strong>Example:</strong> "She centrifuges the tube for [Not Visible Parameter] at [Not Visible Parameter] rpm."
       </div>
       <ul>
         <li><strong>Something is happening but you can't quite tell what.</strong>
-        Mark it <code>[Unclear]</code> and describe what you can see.</li>
+        Mark <code>[Not visible]</code> in the step and describe what you can see.</li>
       </ul>
       <div class="instr-example">
-        <strong>Example:</strong> "She adds [Unclear: appears to be a white powder] to the flask."
+        <strong>Example:</strong> "She adds [Not visible: appears to be a white powder] to the flask."
       </div>
       <ul>
         <li><strong>You can't confidently identify a reagent or instrument.</strong>
@@ -1028,9 +1028,8 @@
       <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
       <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
       <ul>
-        <li><code>[Not visible]</code>: this field might apply, but you cannot clearly see the relevant detail on screen.</li>
+        <li><code>[Not visible]</code>: this field might apply but you cannot clearly see the relevant detail, or (in <strong>Steps</strong>) the action is ambiguous. Say what you can see; in a step you may write <code>[Not visible: adds a white powder from a spatula]</code>.</li>
         <li><code>N/A</code>: this field does not apply to this segment.</li>
-        <li><code>[Unclear]</code>: something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
       </ul>
       <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
       <div class="instr-example">
@@ -1121,17 +1120,17 @@
         <p style="margin-top:10px;">A few cases come up often:</p>
         <ul>
           <li><strong>A parameter would normally be specified, but the video doesn't show or state it.</strong>
-          Mark it as <code>[Not Visible Parameter]</code>.</li>
+          Mark it as <code>[Not Visible Parameter]</code> where that value would appear in the sentence.</li>
         </ul>
         <div class="instr-example">
           <strong>Example:</strong> "She centrifuges the tube for [Not Visible Parameter] at [Not Visible Parameter] rpm."
         </div>
         <ul>
           <li><strong>Something is happening but you can't quite tell what.</strong>
-          Mark it <code>[Unclear]</code> and describe what you can see.</li>
+          Mark <code>[Not visible]</code> in the step and describe what you can see.</li>
         </ul>
         <div class="instr-example">
-          <strong>Example:</strong> "She adds [Unclear: appears to be a white powder] to the flask."
+          <strong>Example:</strong> "She adds [Not visible: appears to be a white powder] to the flask."
         </div>
         <ul>
           <li><strong>You can't confidently identify a reagent or instrument.</strong>
@@ -1154,9 +1153,8 @@
         <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
         <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
         <ul>
-          <li><code>[Not visible]</code>: this field might apply, but you cannot clearly see the relevant detail on screen.</li>
+          <li><code>[Not visible]</code>: this field might apply but you cannot clearly see the relevant detail, or (in <strong>Steps</strong>) the action is ambiguous. Say what you can see; in a step you may write <code>[Not visible: adds a white powder from a spatula]</code>.</li>
           <li><code>N/A</code>: this field does not apply to this segment.</li>
-          <li><code>[Unclear]</code>: something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
         </ul>
         <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
         <div class="instr-example">
@@ -1290,7 +1288,7 @@
 
       <div class="annotation-fields-scroll" id="annotationFields">
         <div class="ann-field ann-field-global-help">
-          <p class="ann-help">Applies to <strong>all</strong> fields below: if the category may apply but you cannot see the relevant detail clearly, write <code>[Not visible]</code>. If the category does not apply to this segment, write <code>N/A</code>.</p>
+          <p class="ann-help">Applies to <strong>all</strong> fields below: if the category may apply but you cannot see the relevant detail clearly, write <code>[Not visible]</code>. In <strong>Steps</strong> you can use <code>[Not visible: …]</code> when the motion is ambiguous and you need to say what you can see. If the category does not apply to this segment, write <code>N/A</code>.</p>
         </div>
         <div class="ann-field">
           <div class="ann-field-intro">
@@ -1306,7 +1304,7 @@
         </div>
         <div class="ann-field ann-field-steps">
           <div class="ann-field-intro">
-            <span class="ann-label">3) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. Include the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example &ldquo;0:12 to 0:18: she opens the tube&rdquo;). If a number or unit should be in the protocol but the video never shows it (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in that step, as in the main instructions. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
+            <span class="ann-label">3) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. Include the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example &ldquo;0:12 to 0:18: she opens the tube&rdquo;). Use <code>[Not Visible Parameter]</code> as a placeholder where a number or unit belongs in the sentence but never appears on screen (duration, rpm, temperature, volume, and similar). If you cannot tell exactly what happens, use <code>[Not visible: …]</code> with your best description. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
           </div>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
