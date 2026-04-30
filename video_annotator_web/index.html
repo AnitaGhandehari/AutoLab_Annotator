@@ -425,13 +425,24 @@
       flex-direction: column;
       gap: 14px;
     }
-    .ann-field > .ann-label,
-    .ann-field label.ann-label {
-      display: block;
+    .ann-field-intro {
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+    .ann-field-intro .ann-label {
+      display: inline;
       font-size: .88rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 2px;
+      margin: 0;
+      padding: 0;
+    }
+    .ann-field-intro .ann-help {
+      display: inline;
+      font-size: .78rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin: 0;
     }
     .ann-help {
       font-size: .78rem;
@@ -1274,29 +1285,34 @@
 
       <div class="annotation-fields-scroll" id="annotationFields">
         <div class="ann-field">
-          <label class="ann-label" for="annEquipment">1) Equipment:</label>
-          <p class="ann-help">Instruments and apparatus (pipettes, centrifuge, balance). If something may be present but you cannot see it clearly, write <code>[Not visible]</code>. If this category does not apply to this part of the video, write <code>N/A</code>.</p>
+          <div class="ann-field-intro">
+            <label class="ann-label" for="annEquipment">1) Equipment:</label> <span class="ann-help">Instruments and apparatus (pipettes, centrifuge, balance). If something may be present but you cannot see it clearly, write <code>[Not visible]</code>. If this category does not apply to this part of the video, write <code>N/A</code>.</span>
+          </div>
           <textarea id="annEquipment" class="ann-input" rows="3" placeholder="e.g. P200 micropipette, microcentrifuge…"></textarea>
         </div>
         <div class="ann-field">
-          <label class="ann-label" for="annMaterials">2) Materials:</label>
-          <p class="ann-help">Consumables, reagents, tubes, samples. If something may be there but is not clearly visible, write <code>[Not visible]</code>. If the question does not apply, write <code>N/A</code>.</p>
+          <div class="ann-field-intro">
+            <label class="ann-label" for="annMaterials">2) Materials:</label> <span class="ann-help">Consumables, reagents, tubes, samples. If something may be there but is not clearly visible, write <code>[Not visible]</code>. If the question does not apply, write <code>N/A</code>.</span>
+          </div>
           <textarea id="annMaterials" class="ann-input" rows="3" placeholder="e.g. 1.5 mL tube, buffer, DNA sample…"></textarea>
         </div>
         <div class="ann-field">
-          <label class="ann-label" for="annActions">3) Actions:</label>
-          <p class="ann-help">What the person does, with clear verbs (pipettes, vortexes, caps). If you cannot see clearly what they are doing, write <code>[Not visible]</code>. If there is no action to describe here, write <code>N/A</code>. If something happens but you are unsure what, use <code>[Unclear]</code> and say what you can see.</p>
+          <div class="ann-field-intro">
+            <label class="ann-label" for="annActions">3) Actions:</label> <span class="ann-help">What the person does, with clear verbs (pipettes, vortexes, caps). If you cannot see clearly what they are doing, write <code>[Not visible]</code>. If there is no action to describe here, write <code>N/A</code>. If something happens but you are unsure what, use <code>[Unclear]</code> and say what you can see.</span>
+          </div>
           <textarea id="annActions" class="ann-input" rows="3" placeholder="e.g. She aspirates 20 µL and dispenses into a second tube…"></textarea>
         </div>
         <div class="ann-field ann-field-steps">
-          <span class="ann-label">4) Steps:</span>
-          <p class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</p>
+          <div class="ann-field-intro">
+            <span class="ann-label">4) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
+          </div>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
         </div>
         <div class="ann-field">
-          <label class="ann-label" for="annVisualizedResults">5) Visualized results:</label>
-          <p class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</p>
+          <div class="ann-field-intro">
+            <label class="ann-label" for="annVisualizedResults">5) Visualized results:</label> <span class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</span>
+          </div>
           <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
         </div>
       </div>
