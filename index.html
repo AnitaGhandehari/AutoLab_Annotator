@@ -233,45 +233,79 @@
       border-color: var(--primary);
     }
 
-    /* ---- Timeline ---- */
+    /* ---- Timeline (standard video-style seek bar + segment ticks) ---- */
     .timeline-bar {
-      padding: 0 18px 14px;
+      padding: 10px 18px 14px;
+    }
+    .timeline-times {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .78rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding: 0 2px;
+      user-select: none;
     }
     .timeline-track {
       position: relative;
-      height: 28px;
-      background: #e2e8f0;
+      height: 12px;
+      background: rgba(15, 23, 42, 0.12);
       border-radius: 6px;
       cursor: pointer;
-      overflow: hidden;
+      touch-action: none;
     }
-    .timeline-segment {
+    .timeline-elapsed {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .timeline-active-shade {
       position: absolute;
       top: 0;
       height: 100%;
-      border-right: 1.5px solid rgba(255,255,255,.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .65rem;
-      color: #fff;
-      font-weight: 600;
-      transition: filter .15s;
-      user-select: none;
-    }
-    .timeline-segment:hover { filter: brightness(1.1); }
-    .timeline-segment.empty { background: #cbd5e1; color: #94a3b8; }
-    .timeline-segment.filled { background: var(--primary); }
-    .timeline-segment.active { outline: 2.5px solid #fbbf24; outline-offset: -2px; }
-    .timeline-playhead {
-      position: absolute;
-      top: -3px;
-      width: 3px;
-      height: 34px;
-      background: var(--danger);
-      border-radius: 2px;
+      background: rgba(79, 70, 229, 0.2);
+      border-radius: 0;
       pointer-events: none;
-      transition: left .25s linear;
+      z-index: 0;
+    }
+    .timeline-ticks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .timeline-tick {
+      position: absolute;
+      top: -2px;
+      bottom: -2px;
+      width: 2px;
+      margin-left: -1px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.15);
+      border-radius: 1px;
+    }
+    .timeline-thumb {
+      position: absolute;
+      top: 50%;
+      width: 15px;
+      height: 15px;
+      margin-top: -7.5px;
+      margin-left: -7.5px;
+      background: #fff;
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      pointer-events: none;
+      z-index: 3;
+      left: 0%;
     }
 
     /* ---- Sidebar ---- */
@@ -881,8 +915,15 @@
       </video>
 
       <div class="timeline-bar">
+        <div class="timeline-times">
+          <span id="timelineCurrent">0:00</span>
+          <span id="timelineDuration">0:00</span>
+        </div>
         <div class="timeline-track" id="timeline">
-          <div class="timeline-playhead" id="playhead"></div>
+          <div class="timeline-active-shade" id="timelineActiveShade"></div>
+          <div class="timeline-elapsed" id="timelineElapsed"></div>
+          <div class="timeline-ticks" id="timelineTicks"></div>
+          <div class="timeline-thumb" id="timelineThumb"></div>
         </div>
       </div>
 
@@ -955,8 +996,13 @@ const NOTIFY_EMAIL = 'ani.ghandehari@gmail.com';
 /* ---- DOM refs ---- */
 const vid         = document.getElementById('vid');
 const timeline    = document.getElementById('timeline');
-const playhead    = document.getElementById('playhead');
+const timelineElapsed = document.getElementById('timelineElapsed');
+const timelineThumb   = document.getElementById('timelineThumb');
+const timelineTicks   = document.getElementById('timelineTicks');
+const timelineActiveShade = document.getElementById('timelineActiveShade');
 const videoSelect = document.getElementById('videoSelect');
+
+let timelineDrag = false;
 
 let segments     = [];
 let annotations  = {};  // { segmentIdx: "text" }  for current video
@@ -1303,39 +1349,144 @@ vid.addEventListener('loadedmetadata', async () => {
   }
 
   loadAnnotationsLocal();
+  document.getElementById('timelineDuration').textContent = fmt(dur);
   buildTimeline();
   buildSegmentList();
   updateProgress();
   goToSegment(0);
 });
 
-/* ================================================================
-   TIMELINE
-   ================================================================ */
-function buildTimeline() {
-  document.querySelectorAll('.timeline-segment').forEach(e => e.remove());
-  const dur = vid.duration;
-  segments.forEach(seg => {
-    const el = document.createElement('div');
-    el.className = 'timeline-segment';
-    el.style.left  = `${(seg.start / dur) * 100}%`;
-    el.style.width = `${((seg.end - seg.start) / dur) * 100}%`;
-    el.textContent  = `${seg.idx + 1}`;
-    el.dataset.idx  = seg.idx;
-    el.addEventListener('click', () => goToSegment(seg.idx));
-    timeline.appendChild(el);
-  });
-  refreshTimelineColors();
+function segmentIndexAtTime(t) {
+  if (!segments.length) return 0;
+  for (let i = 0; i < segments.length; i++) {
+    const s = segments[i];
+    const isLast = i === segments.length - 1;
+    if (isLast) {
+      if (t >= s.start && t <= s.end + 0.05) return i;
+    } else if (t >= s.start && t < s.end) {
+      return i;
+    }
+  }
+  if (t < segments[0].start) return 0;
+  return segments.length - 1;
 }
 
-function refreshTimelineColors() {
-  document.querySelectorAll('.timeline-segment').forEach(el => {
-    const idx = parseInt(el.dataset.idx);
-    el.classList.toggle('filled', !!annotations[idx]);
-    el.classList.toggle('empty', !annotations[idx]);
-    el.classList.toggle('active', idx === currentIdx);
-  });
+function updateTimelineDisplay() {
+  const dur = vid.duration;
+  if (!dur || !Number.isFinite(dur)) return;
+  const p = Math.max(0, Math.min(1, vid.currentTime / dur));
+  const pct = p * 100;
+  timelineElapsed.style.width = `${pct}%`;
+  timelineThumb.style.left = `${pct}%`;
+  const cur = document.getElementById('timelineCurrent');
+  if (cur) cur.textContent = fmt(vid.currentTime);
 }
+
+function updateTimelineActiveShade() {
+  const dur = vid.duration;
+  const seg = segments[currentIdx];
+  if (!dur || !Number.isFinite(dur) || !seg) {
+    timelineActiveShade.style.left = '0%';
+    timelineActiveShade.style.width = '0%';
+    return;
+  }
+  const left = (seg.start / dur) * 100;
+  const w = ((seg.end - seg.start) / dur) * 100;
+  timelineActiveShade.style.left = `${left}%`;
+  timelineActiveShade.style.width = `${Math.max(0.2, w)}%`;
+}
+
+function seekFromTimelineClientX(clientX) {
+  const rect = timeline.getBoundingClientRect();
+  const w = rect.width || 1;
+  const t = Math.max(0, Math.min(1, (clientX - rect.left) / w));
+  if (vid.duration && Number.isFinite(vid.duration)) {
+    vid.currentTime = t * vid.duration;
+    updateTimelineDisplay();
+  }
+}
+
+function buildTimeline() {
+  timelineTicks.innerHTML = '';
+  const dur = vid.duration;
+  if (!dur || !Number.isFinite(dur)) return;
+  segments.forEach((seg) => {
+    const tick = document.createElement('div');
+    tick.className = 'timeline-tick';
+    tick.style.left = `${(seg.start / dur) * 100}%`;
+    timelineTicks.appendChild(tick);
+  });
+  if (segments.length) {
+    const last = segments[segments.length - 1];
+    const tickEnd = document.createElement('div');
+    tickEnd.className = 'timeline-tick';
+    tickEnd.style.left = `${Math.min(100, (last.end / dur) * 100)}%`;
+    timelineTicks.appendChild(tickEnd);
+  }
+  updateTimelineActiveShade();
+  updateTimelineDisplay();
+}
+
+function selectSegment(idx, opts = {}) {
+  const seekToStart = opts.seekToStart !== false;
+  const next = Math.max(0, Math.min(idx, segments.length - 1));
+  if (initialized) {
+    autoSaveCurrent();
+    saveAnnotationsLocal();
+  }
+  currentIdx = next;
+  const seg = segments[currentIdx];
+  if (seekToStart) {
+    vid.currentTime = seg.start;
+  }
+
+  document.getElementById('segLabel').textContent =
+    `Section ${currentIdx + 1} / ${totalSegs}`;
+
+  document.getElementById('cardTitleLine1').textContent =
+    `Segment ${currentIdx + 1}:`;
+  const line2 = document.getElementById('cardTitleLine2');
+  line2.textContent = seg.label ? seg.label : '';
+  document.getElementById('cardRange').textContent =
+    `${fmt(seg.start)} – ${fmt(seg.end)}`;
+  document.getElementById('explanation').value = annotations[currentIdx] || '';
+
+  updateTimelineDisplay();
+  updateTimelineActiveShade();
+  refreshSegmentList();
+  updateProgress();
+
+  document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
+  initialized = true;
+}
+
+function goToSegment(idx) {
+  selectSegment(idx, { seekToStart: true });
+}
+
+function endTimelinePointer(e) {
+  if (!timelineDrag) return;
+  timelineDrag = false;
+  try { timeline.releasePointerCapture(e.pointerId); } catch (_) {}
+  const idx = segmentIndexAtTime(vid.currentTime);
+  selectSegment(idx, { seekToStart: false });
+}
+
+timeline.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  timelineDrag = true;
+  timeline.setPointerCapture(e.pointerId);
+  seekFromTimelineClientX(e.clientX);
+});
+
+timeline.addEventListener('pointermove', (e) => {
+  if (!timelineDrag) return;
+  seekFromTimelineClientX(e.clientX);
+});
+
+timeline.addEventListener('pointerup', endTimelinePointer);
+timeline.addEventListener('pointercancel', endTimelinePointer);
+
 
 /* ================================================================
    SEGMENT LIST (sidebar)
@@ -1380,49 +1531,14 @@ function updateProgress() {
 }
 
 /* ================================================================
-   NAVIGATION
-   ================================================================ */
-function goToSegment(idx) {
-  if (initialized) {
-    autoSaveCurrent();
-    saveAnnotationsLocal();
-  }
-  currentIdx = Math.max(0, Math.min(idx, segments.length - 1));
-  const seg = segments[currentIdx];
-
-  vid.currentTime = seg.start;
-
-  document.getElementById('segLabel').textContent =
-    `Section ${currentIdx + 1} / ${totalSegs}`;
-
-  document.getElementById('cardTitleLine1').textContent =
-    `Segment ${currentIdx + 1}:`;
-  const line2 = document.getElementById('cardTitleLine2');
-  line2.textContent = seg.label ? seg.label : '';
-  document.getElementById('cardRange').textContent =
-    `${fmt(seg.start)} – ${fmt(seg.end)}`;
-  document.getElementById('explanation').value = annotations[currentIdx] || '';
-
-  refreshTimelineColors();
-  refreshSegmentList();
-  updateProgress();
-
-  document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
-  initialized = true;
-}
-
-/* ================================================================
    PLAYBACK
    ================================================================ */
-vid.addEventListener('timeupdate', () => {
   const seg = segments[currentIdx];
   if (seg && vid.currentTime >= seg.end) {
     vid.pause();
     updatePlayBtn();
   }
-  if (vid.duration) {
-    playhead.style.left = `${(vid.currentTime / vid.duration) * 100}%`;
-  }
+  updateTimelineDisplay();
 });
 
 function updatePlayBtn() {
@@ -1465,7 +1581,6 @@ function autoSaveCurrent() {
 document.getElementById('btnSave').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
-  refreshTimelineColors();
   refreshSegmentList();
   updateProgress();
   flash('Saved!');
@@ -1475,7 +1590,6 @@ document.getElementById('btnClear').addEventListener('click', () => {
   document.getElementById('explanation').value = '';
   delete annotations[currentIdx];
   saveAnnotationsLocal();
-  refreshTimelineColors();
   refreshSegmentList();
   updateProgress();
 });
