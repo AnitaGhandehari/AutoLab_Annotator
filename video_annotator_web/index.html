@@ -8,8 +8,8 @@
     :root {
       --primary: #4f46e5;
       --primary-hover: #4338ca;
-      --extra-note: #f9a8d4;
-      --extra-note-hover: #f472b6;
+      --extra-note: #ec4899;
+      --extra-note-hover: #db2777;
       --extra-note-ink: #0f172a;
       --bg: #f8fafc;
       --card: #ffffff;
@@ -232,20 +232,20 @@
       background: var(--extra-note);
       color: var(--extra-note-ink);
       font-weight: 600;
-      border: 1px solid rgba(233, 30, 99, 0.28);
+      border: 1px solid rgba(219, 39, 119, 0.45);
     }
     .btn-extra-note:hover {
       background: var(--extra-note-hover);
       color: var(--extra-note-ink);
-      border-color: rgba(219, 39, 119, 0.35);
+      border-color: rgba(157, 23, 77, 0.5);
     }
     .video-controls .btn-extra-note {
-      border: 1px solid rgba(233, 30, 99, 0.32);
+      border: 1px solid rgba(219, 39, 119, 0.45);
       font-weight: 600;
       color: var(--extra-note-ink);
     }
     .video-controls .btn-extra-note:hover {
-      border-color: rgba(219, 39, 119, 0.45);
+      border-color: rgba(157, 23, 77, 0.55);
     }
 
     .segment-indicator {
@@ -425,12 +425,13 @@
       flex-direction: column;
       gap: 14px;
     }
+    .ann-field > .ann-label,
     .ann-field label.ann-label {
       display: block;
       font-size: .88rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .ann-help {
       font-size: .78rem;
@@ -1186,7 +1187,7 @@
       <p class="extra-note-modal-time">Time in video: <strong id="extraNoteModalTimeLabel">0:00</strong></p>
       <textarea id="extraNoteModalInput" class="ann-input" rows="4" placeholder="Type the extra information for this moment…" aria-label="Extra note text"></textarea>
       <div class="extra-note-modal-actions">
-        <button type="button" class="btn-extra-note" id="btnExtraNoteSave">Save note</button>
+        <button type="button" class="btn-primary" id="btnExtraNoteSave">Save note</button>
         <button type="button" class="btn-outline" id="btnExtraNoteCancel">Close</button>
       </div>
       <div class="extra-note-modal-list-title">Notes for this segment (exported as Extra_Notes)</div>
@@ -1273,28 +1274,28 @@
 
       <div class="annotation-fields-scroll" id="annotationFields">
         <div class="ann-field">
-          <label class="ann-label" for="annEquipment">1) Equipment</label>
+          <label class="ann-label" for="annEquipment">1) Equipment:</label>
           <p class="ann-help">Instruments and apparatus (pipettes, centrifuge, balance). If something may be present but you cannot see it clearly, write <code>[Not visible]</code>. If this category does not apply to this part of the video, write <code>N/A</code>.</p>
           <textarea id="annEquipment" class="ann-input" rows="3" placeholder="e.g. P200 micropipette, microcentrifuge…"></textarea>
         </div>
         <div class="ann-field">
-          <label class="ann-label" for="annMaterials">2) Materials</label>
+          <label class="ann-label" for="annMaterials">2) Materials:</label>
           <p class="ann-help">Consumables, reagents, tubes, samples. If something may be there but is not clearly visible, write <code>[Not visible]</code>. If the question does not apply, write <code>N/A</code>.</p>
           <textarea id="annMaterials" class="ann-input" rows="3" placeholder="e.g. 1.5 mL tube, buffer, DNA sample…"></textarea>
         </div>
         <div class="ann-field">
-          <label class="ann-label" for="annActions">3) Actions</label>
+          <label class="ann-label" for="annActions">3) Actions:</label>
           <p class="ann-help">What the person does, with clear verbs (pipettes, vortexes, caps). If you cannot see clearly what they are doing, write <code>[Not visible]</code>. If there is no action to describe here, write <code>N/A</code>. If something happens but you are unsure what, use <code>[Unclear]</code> and say what you can see.</p>
           <textarea id="annActions" class="ann-input" rows="3" placeholder="e.g. She aspirates 20 µL and dispenses into a second tube…"></textarea>
         </div>
         <div class="ann-field ann-field-steps">
-          <span class="ann-label">4) Steps</span>
+          <span class="ann-label">4) Steps:</span>
           <p class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</p>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
         </div>
         <div class="ann-field">
-          <label class="ann-label" for="annVisualizedResults">5) Visualized results</label>
+          <label class="ann-label" for="annVisualizedResults">5) Visualized results:</label>
           <p class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</p>
           <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
         </div>
