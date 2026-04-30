@@ -30,7 +30,7 @@
       line-height: 1.5;
     }
 
-    /* ---- Login screen ---- */
+    /* Login screen */
     .login-overlay {
       position: fixed;
       inset: 0;
@@ -107,7 +107,7 @@
       line-height: 1.35;
     }
 
-    /* ---- Header ---- */
+    /* Header */
     header {
       background: var(--primary);
       color: white;
@@ -148,7 +148,7 @@
     }
     .btn-logout:hover { background: rgba(255,255,255,.25); }
 
-    /* ---- Main container ---- */
+    /* Main container */
     .container {
       max-width: 1320px;
       margin: 24px auto;
@@ -159,7 +159,7 @@
       align-items: stretch;
     }
 
-    /* ---- Left column: tall video + progress/segments below ---- */
+    /* Left column: tall video + progress/segments below */
     .video-column {
       display: flex;
       flex-direction: column;
@@ -173,7 +173,7 @@
       flex-shrink: 0;
     }
 
-    /* ---- Video panel ---- */
+    /* Video panel */
     .video-panel {
       background: var(--card);
       border-radius: 12px;
@@ -255,7 +255,7 @@
       font-weight: 500;
     }
 
-    /* ---- Video selector ---- */
+    /* Video selector */
     .video-selector {
       padding: 14px 18px;
       display: flex;
@@ -286,7 +286,7 @@
       border-color: var(--primary);
     }
 
-    /* ---- Timeline (standard video-style seek bar + segment ticks) ---- */
+    /* Timeline (standard video-style seek bar + segment ticks) */
     .timeline-bar {
       padding: 10px 18px 14px;
     }
@@ -361,7 +361,7 @@
       left: 0%;
     }
 
-    /* ---- Sidebar ---- */
+    /* Sidebar */
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -621,7 +621,7 @@
       word-break: break-word;
     }
 
-    /* ---- Segment list ---- */
+    /* Segment list */
     .segment-list {
       background: var(--card);
       border-radius: 12px;
@@ -680,7 +680,7 @@
       min-height: 1.4em;
     }
 
-    /* ---- Progress summary ---- */
+    /* Progress summary */
     .progress-card {
       background: var(--card);
       border-radius: 12px;
@@ -710,7 +710,7 @@
       color: var(--text-muted);
     }
 
-    /* ---- Instructions overlay ---- */
+    /* Instructions overlay */
     .instructions-overlay {
       position: fixed;
       inset: 0;
@@ -720,7 +720,7 @@
     }
     .instructions-overlay.hidden { display: none; }
 
-    /* ---- Instructions modal (popup from annotator) ---- */
+    /* Instructions modal (popup from annotator) */
     .instructions-modal-bg {
       position: fixed;
       inset: 0;
@@ -924,7 +924,7 @@
 </head>
 <body>
 
-<!-- =================== LOGIN SCREEN =================== -->
+<!-- LOGIN SCREEN -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <h1>AutoLab Annotator</h1>
@@ -938,7 +938,7 @@
   </div>
 </div>
 
-<!-- =================== INSTRUCTIONS SCREEN =================== -->
+<!-- INSTRUCTIONS SCREEN -->
 <div class="instructions-overlay hidden" id="instructionsOverlay">
   <div class="instructions-header">
     <span style="display:flex; width:90px; height:90px; border-radius:50%; background:white; box-shadow:0 4px 16px rgba(0,0,0,.15); overflow:hidden; margin:0 auto 12px; align-items:center; justify-content:center;">
@@ -1020,24 +1020,24 @@
       <h2><span class="step-num">4</span> Output Format</h2>
       <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the four panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
       <ul>
-        <li><strong>equipment</strong> — apparatus and instruments you see.</li>
-        <li><strong>materials</strong> — consumables, reagents, tubes, samples.</li>
-        <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
-        <li><strong>visualized_results</strong> — observable outcomes (color, bands, precipitate, phases).</li>
+        <li><strong>equipment</strong>: apparatus and instruments you see.</li>
+        <li><strong>materials</strong>: consumables, reagents, tubes, samples.</li>
+        <li><strong>steps</strong>: ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
+        <li><strong>visualized_results</strong>: observable outcomes (color, bands, precipitate, phases).</li>
       </ul>
       <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
       <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
       <ul>
-        <li><code>[Not visible]</code> — this field might apply, but you cannot clearly see the relevant detail on screen.</li>
-        <li><code>N/A</code> — this field does not apply to this segment.</li>
-        <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
+        <li><code>[Not visible]</code>: this field might apply, but you cannot clearly see the relevant detail on screen.</li>
+        <li><code>N/A</code>: this field does not apply to this segment.</li>
+        <li><code>[Unclear]</code>: something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
       </ul>
       <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
       <div class="instr-example">
         <strong>Step formatting example:</strong><br/>
-        <strong>Step 1:</strong> 0:00–0:08: She attaches a disposable tip to a P200 micropipette.<br/>
+        <strong>Step 1:</strong> 0:00 to 0:08: She attaches a disposable tip to a P200 micropipette.<br/>
         <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
-        <strong>Step 3:</strong> 0:22–0:26: She caps the receiving tube and inverts it three times to mix.
+        <strong>Step 3:</strong> 0:22 to 0:26: She caps the receiving tube and inverts it three times to mix.
       </div>
     </div>
 
@@ -1050,7 +1050,7 @@
         <li>Optional: the <strong>Extra Note</strong> button (pink, next to <strong>Replay</strong>) saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
-        <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog) — it uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
+        <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
       </ol>
       <div class="instr-tip">
         <strong>Keyboard shortcuts:</strong>
@@ -1067,12 +1067,12 @@
   </div>
 </div>
 
-<!-- =================== INSTRUCTIONS POPUP (from annotator) =================== -->
+<!-- INSTRUCTIONS POPUP (from annotator) -->
 <div class="instructions-modal-bg hidden" id="instrModal">
   <div class="instructions-modal">
     <div class="instructions-header" style="border-radius:16px 16px 0 0;">
       <h1>Annotation Instructions</h1>
-      <p class="instr-modal-lead">Full reference — same content as on the welcome screen. Reopen anytime from <strong>Instructions</strong> in the top bar.</p>
+      <p class="instr-modal-lead">Full reference: same content as on the welcome screen. Reopen anytime from <strong>Instructions</strong> in the top bar.</p>
     </div>
     <div class="instructions-body" style="padding-bottom:24px;">
 
@@ -1146,24 +1146,24 @@
         <h2><span class="step-num">4</span> Output Format</h2>
         <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the four panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
         <ul>
-          <li><strong>equipment</strong> — apparatus and instruments you see.</li>
-          <li><strong>materials</strong> — consumables, reagents, tubes, samples.</li>
-          <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
-          <li><strong>visualized_results</strong> — observable outcomes (color, bands, precipitate, phases).</li>
+          <li><strong>equipment</strong>: apparatus and instruments you see.</li>
+          <li><strong>materials</strong>: consumables, reagents, tubes, samples.</li>
+          <li><strong>steps</strong>: ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
+          <li><strong>visualized_results</strong>: observable outcomes (color, bands, precipitate, phases).</li>
         </ul>
         <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
         <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
         <ul>
-          <li><code>[Not visible]</code> — this field might apply, but you cannot clearly see the relevant detail on screen.</li>
-          <li><code>N/A</code> — this field does not apply to this segment.</li>
-          <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
+          <li><code>[Not visible]</code>: this field might apply, but you cannot clearly see the relevant detail on screen.</li>
+          <li><code>N/A</code>: this field does not apply to this segment.</li>
+          <li><code>[Unclear]</code>: something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
         </ul>
         <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
         <div class="instr-example">
           <strong>Step formatting example:</strong><br/>
-          <strong>Step 1:</strong> 0:00–0:08: She attaches a disposable tip to a P200 micropipette.<br/>
+          <strong>Step 1:</strong> 0:00 to 0:08: She attaches a disposable tip to a P200 micropipette.<br/>
           <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
-          <strong>Step 3:</strong> 0:22–0:26: She caps the receiving tube and inverts it three times to mix.
+          <strong>Step 3:</strong> 0:22 to 0:26: She caps the receiving tube and inverts it three times to mix.
         </div>
       </div>
 
@@ -1176,7 +1176,7 @@
           <li>Optional: the <strong>Extra Note</strong> button (pink, next to <strong>Replay</strong>) saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
-          <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog) — it uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
+          <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
         </ol>
         <div class="instr-tip">
           <strong>Keyboard shortcuts:</strong>
@@ -1212,7 +1212,7 @@
   </div>
 </div>
 
-<!-- =================== MAIN APP =================== -->
+<!-- MAIN APP -->
 <header>
   <h1>AutoLab Annotator</h1>
   <span class="badge" id="videoBadge"></span>
@@ -1286,7 +1286,7 @@
         <div id="cardTitleLine1" class="card-title-line1">Segment 1:</div>
         <div id="cardTitleLine2" class="card-title-line2"></div>
       </div>
-      <div class="time-range" id="cardRange">0:00 – 0:30</div>
+      <div class="time-range" id="cardRange">0:00 to 0:30</div>
 
       <div class="annotation-fields-scroll" id="annotationFields">
         <div class="ann-field ann-field-global-help">
@@ -1332,14 +1332,12 @@
 <!-- Parse per-video segment tables (.xlsx or .csv next to each .mp4) -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
-/* ================================================================
-   CONFIGURATION — edit this list to add/remove videos.
+/* CONFIGURATION: edit this list to add/remove videos.
    Each entry: { id, label, src }
    "src" is relative to this HTML file (or an absolute URL).
    Place a segment table next to each .mp4: same basename with .xlsx or .csv
    (columns start and end in seconds; optional step label e.g. action sentence).
-   If neither file exists, the app falls back to fixed-length chunks.
-   ================================================================ */
+   If neither file exists, the app falls back to fixed-length chunks. */
 const VIDEOS = [
   { id: 'extractdna_1',      label: 'Extract DNA 1',     src: 'videos/extractdna_1.mp4' },
   { id: 'electrophoresis_1', label: 'Electrophoresis 1', src: 'videos/electrophoresis_1.mp4' },
@@ -1357,7 +1355,7 @@ try {
 }
 const NOTIFY_EMAIL = 'ani.ghandehari@gmail.com';
 
-/* ---- DOM refs ---- */
+/* DOM refs */
 const vid         = document.getElementById('vid');
 const timeline    = document.getElementById('timeline');
 const timelineElapsed = document.getElementById('timelineElapsed');
@@ -1381,10 +1379,8 @@ let segmentSource = 'default'; // 'spreadsheet' | 'default'
 let currentUser  = null; // { first, last }
 let initialized  = false;
 
-/* ================================================================
-   LOCAL STORAGE — all annotations stored per-user per-video
-   Key format: "autolab_<first>_<last>_<videoId>"
-   ================================================================ */
+/* LOCAL STORAGE: all annotations stored per-user per-video.
+   Key format: "autolab_<first>_<last>_<videoId>" */
 function storageKey(videoId) {
   const l = (currentUser.last || '').trim();
   const lastPart = l || '_single';
@@ -1498,7 +1494,7 @@ function createStepRow(value) {
   const ta = document.createElement('textarea');
   ta.className = 'ann-input step-input';
   ta.rows = 2;
-  ta.placeholder = 'e.g. 0:05–0:14: describe the action (give the time range or the second when it happens)';
+  ta.placeholder = 'e.g. 0:05 to 0:14: describe the action (give the time range or the second when it happens)';
   ta.value = value;
   const act = document.createElement('div');
   act.className = 'step-row-actions';
@@ -1723,7 +1719,7 @@ function segmentExportHasContent(s) {
     || extraKeys;
 }
 
-/* ---- Helpers ---- */
+/* Helpers */
 function fmt(sec) {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
@@ -1879,9 +1875,7 @@ async function loadSegmentsFromSpreadsheet(entry, dur) {
   };
 }
 
-/* ================================================================
-   LOGIN
-   ================================================================ */
+/* LOGIN */
 function displayUserName() {
   if (!currentUser) return '';
   const f = (currentUser.first || '').trim();
@@ -1997,9 +1991,7 @@ function enterApp() {
   populateVideoList();
 }
 
-/* ================================================================
-   VIDEO SELECTION
-   ================================================================ */
+/* VIDEO SELECTION */
 function populateVideoList() {
   videoSelect.innerHTML = '';
   VIDEOS.forEach(v => {
@@ -2029,9 +2021,7 @@ function switchVideo(videoId) {
 
 videoSelect.addEventListener('change', () => switchVideo(videoSelect.value));
 
-/* ================================================================
-   INIT AFTER VIDEO METADATA LOADED
-   ================================================================ */
+/* INIT AFTER VIDEO METADATA LOADED */
 vid.addEventListener('loadedmetadata', async () => {
   const dur = vid.duration;
   const videoIdWhenLoaded = currentVideoId;
@@ -2169,7 +2159,7 @@ function selectSegment(idx, opts = {}) {
   const line2 = document.getElementById('cardTitleLine2');
   line2.textContent = seg.label ? seg.label : '';
   document.getElementById('cardRange').textContent =
-    `${fmt(seg.start)} – ${fmt(seg.end)}`;
+    `${fmt(seg.start)} to ${fmt(seg.end)}`;
   writeAnnotationToForm(annotations[currentIdx]);
 
   updateTimelineDisplay();
@@ -2209,9 +2199,7 @@ timeline.addEventListener('pointerup', endTimelinePointer);
 timeline.addEventListener('pointercancel', endTimelinePointer);
 
 
-/* ================================================================
-   SEGMENT LIST (sidebar)
-   ================================================================ */
+/* SEGMENT LIST (sidebar) */
 function buildSegmentList() {
   const list = document.getElementById('segmentList');
   list.querySelectorAll('.seg-item').forEach(e => e.remove());
@@ -2223,7 +2211,7 @@ function buildSegmentList() {
     item.innerHTML = `
       <span class="dot"></span>
       <span>${title}</span>
-      <span class="seg-time">${fmt(seg.start)} – ${fmt(seg.end)}</span>
+      <span class="seg-time">${fmt(seg.start)} to ${fmt(seg.end)}</span>
     `;
     item.addEventListener('click', () => goToSegment(seg.idx));
     list.appendChild(item);
@@ -2240,9 +2228,7 @@ function refreshSegmentList() {
   });
 }
 
-/* ================================================================
-   PROGRESS
-   ================================================================ */
+/* PROGRESS */
 function updateProgress() {
   const done = segments.filter((seg) => !isAnnotationEmpty(annotations[seg.idx])).length;
   const total = segments.length;
@@ -2251,9 +2237,7 @@ function updateProgress() {
   document.getElementById('progressLabel').textContent = `${done} / ${total} segments annotated (${pct}%)`;
 }
 
-/* ================================================================
-   PLAYBACK
-   ================================================================ */
+/* PLAYBACK */
 vid.addEventListener('timeupdate', () => {
   const seg = segments[currentIdx];
   if (seg && vid.currentTime >= seg.end) {
@@ -2288,9 +2272,7 @@ document.getElementById('btnReplay').addEventListener('click', () => {
   updatePlayBtn();
 });
 
-/* ================================================================
-   SAVE / CLEAR / EXPORT
-   ================================================================ */
+/* SAVE / CLEAR / EXPORT */
 function autoSaveCurrent() {
   const obj = readStructuredAnnotationFromForm();
   if (isAnnotationEmpty(obj)) {
@@ -2364,9 +2346,7 @@ document.getElementById('btnExport').addEventListener('click', () => {
   flash('Exported!');
 });
 
-/* ================================================================
-   DONE / SUBMIT — save to GitHub + email notification
-   ================================================================ */
+/* DONE / SUBMIT: save to GitHub + email notification */
 function buildExportData() {
   autoSaveCurrent();
   saveAnnotationsLocal();
@@ -2433,7 +2413,7 @@ async function sendEmailNotification(exportData) {
     `Download JSON file: ${rawFileUrl}`,
     `View on GitHub: ${githubFileUrl}`,
     ``,
-    `--- Full Annotation JSON ---`,
+    `Full Annotation JSON`,
     ``,
     JSON.stringify(exportData, null, 2),
   ].join('\n');
@@ -2501,9 +2481,7 @@ document.getElementById('btnDone').addEventListener('click', async () => {
   }
 });
 
-/* ================================================================
-   KEYBOARD SHORTCUTS
-   ================================================================ */
+/* KEYBOARD SHORTCUTS */
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
   if (e.key === 'ArrowLeft')  { e.preventDefault(); goToSegment(currentIdx - 1); }
@@ -2511,9 +2489,7 @@ document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); document.getElementById('btnPlay').click(); }
 });
 
-/* ================================================================
-   BOOT
-   ================================================================ */
+/* BOOT */
 checkExistingSession();
 </script>
 

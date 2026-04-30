@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Video Annotator — BioVL-QR</title>
+  <title>Video Annotator: BioVL-QR</title>
   <style>
     :root {
       --primary: #4f46e5;
@@ -53,7 +53,7 @@
       gap: 24px;
     }
 
-    /* ---- Video panel ---- */
+    /* Video panel */
     .video-panel {
       background: var(--card);
       border-radius: 12px;
@@ -102,7 +102,7 @@
       font-weight: 500;
     }
 
-    /* ---- Timeline ---- */
+    /* Timeline */
     .timeline-bar {
       padding: 0 18px 14px;
     }
@@ -143,7 +143,7 @@
       transition: left .25s linear;
     }
 
-    /* ---- Sidebar ---- */
+    /* Sidebar */
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -186,7 +186,7 @@
       gap: 8px;
     }
 
-    /* ---- Segment list ---- */
+    /* Segment list */
     .segment-list {
       background: var(--card);
       border-radius: 12px;
@@ -229,7 +229,7 @@
       min-height: 1.4em;
     }
 
-    /* ---- Video selector ---- */
+    /* Video selector */
     .video-selector {
       padding: 14px 18px;
       display: flex;
@@ -269,7 +269,7 @@
 
 <header>
   <h1>Video Annotator</h1>
-  <span class="badge" id="videoBadge">—</span>
+  <span class="badge" id="videoBadge">…</span>
   <span class="badge" id="totalSegments"></span>
 </header>
 
@@ -296,7 +296,7 @@
         <button class="btn-primary" id="btnPlay">Play</button>
         <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
         <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
-        <span class="segment-indicator" id="segLabel">Segment 1 / —</span>
+        <span class="segment-indicator" id="segLabel">Segment 1 / …</span>
       </div>
     </div>
   </div>
@@ -305,7 +305,7 @@
   <div class="sidebar">
     <div class="annotation-card">
       <h2 id="cardTitle">Segment 1</h2>
-      <div class="time-range" id="cardRange">0:00 – 0:30</div>
+      <div class="time-range" id="cardRange">0:00 to 0:30</div>
       <textarea id="explanation" placeholder="Describe what is happening in this segment of the video…"></textarea>
       <div class="card-actions">
         <button class="btn-accent" id="btnSave">Save</button>
@@ -339,7 +339,7 @@ let currentVideoId = '';
 let segmentSource = 'default';
 let segmentSheetName = null;
 
-/* ---- Helpers ---- */
+/* Helpers */
 function fmt(sec) {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
@@ -352,7 +352,7 @@ function flash(msg) {
   setTimeout(() => el.textContent = '', 2500);
 }
 
-/* ---- Video selection ---- */
+/* Video selection */
 async function populateVideoList() {
   const res = await fetch('/videos');
   const videos = await res.json();
@@ -379,7 +379,7 @@ async function switchVideo(videoId) {
 
 videoSelect.addEventListener('change', () => switchVideo(videoSelect.value));
 
-/* ---- Init after metadata loaded ---- */
+/* Init after metadata loaded */
 vid.addEventListener('loadedmetadata', async () => {
   const dur = vid.duration;
   segmentSource = 'default';
@@ -440,7 +440,7 @@ vid.addEventListener('loadedmetadata', async () => {
   goToSegment(0);
 });
 
-/* ---- Bootstrap ---- */
+/* Bootstrap */
 (async () => {
   const videos = await populateVideoList();
   if (videos.length > 0) {
@@ -449,7 +449,7 @@ vid.addEventListener('loadedmetadata', async () => {
   }
 })();
 
-/* ---- Timeline rendering ---- */
+/* Timeline rendering */
 function buildTimeline() {
   document.querySelectorAll('.timeline-segment').forEach(e => e.remove());
   const dur = vid.duration;
@@ -475,7 +475,7 @@ function refreshTimelineColors() {
   });
 }
 
-/* ---- Segment list in sidebar ---- */
+/* Segment list in sidebar */
 function buildSegmentList() {
   const list = document.getElementById('segmentList');
   list.querySelectorAll('.seg-item').forEach(e => e.remove());
@@ -489,7 +489,7 @@ function buildSegmentList() {
     item.innerHTML = `
       <span class="dot"></span>
       <span>${title}</span>
-      <span class="seg-time">${fmt(seg.start)} – ${fmt(seg.end)}</span>
+      <span class="seg-time">${fmt(seg.start)} to ${fmt(seg.end)}</span>
     `;
     item.addEventListener('click', () => goToSegment(seg.idx));
     list.appendChild(item);
@@ -506,7 +506,7 @@ function refreshSegmentList() {
   });
 }
 
-/* ---- Navigation ---- */
+/* Navigation */
 function goToSegment(idx) {
   autoSaveCurrent();
   currentIdx = Math.max(0, Math.min(idx, segments.length - 1));
@@ -521,7 +521,7 @@ function goToSegment(idx) {
       : `Segment ${currentIdx + 1} / ${totalSegments}`;
   document.getElementById('cardTitle').textContent = cardLabel;
   document.getElementById('cardRange').textContent =
-    `${fmt(seg.start)} – ${fmt(seg.end)}`;
+    `${fmt(seg.start)} to ${fmt(seg.end)}`;
   document.getElementById('explanation').value = annotations[currentIdx] || '';
 
   refreshTimelineColors();
@@ -530,7 +530,7 @@ function goToSegment(idx) {
   document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
 }
 
-/* ---- Playback: pause at segment boundary ---- */
+/* Playback: pause at segment boundary */
 vid.addEventListener('timeupdate', () => {
   const seg = segments[currentIdx];
   if (vid.currentTime >= seg.end) {
@@ -545,7 +545,7 @@ function updatePlayBtn() {
   document.getElementById('btnPlay').textContent = vid.paused ? 'Play' : 'Pause';
 }
 
-/* ---- Button handlers ---- */
+/* Button handlers */
 document.getElementById('btnPlay').addEventListener('click', () => {
   if (vid.paused) {
     const seg = segments[currentIdx];
@@ -567,7 +567,7 @@ document.getElementById('btnReplay').addEventListener('click', () => {
   updatePlayBtn();
 });
 
-/* ---- Save / clear / export ---- */
+/* Save / clear / export */
 function autoSaveCurrent() {
   const text = document.getElementById('explanation').value.trim();
   if (text) {
@@ -616,7 +616,7 @@ document.getElementById('btnExport').addEventListener('click', () => {
   flash('Exported!');
 });
 
-/* ---- Persist to server ---- */
+/* Persist to server */
 async function persistAnnotations() {
   await fetch(`/annotations/${currentVideoId}`, {
     method: 'POST',
@@ -636,7 +636,7 @@ async function loadAnnotations() {
   } catch { annotations = {}; }
 }
 
-/* ---- Keyboard shortcuts ---- */
+/* Keyboard shortcuts */
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'TEXTAREA') return;
   if (e.key === 'ArrowLeft')  { e.preventDefault(); goToSegment(currentIdx - 1); }
