@@ -817,12 +817,12 @@
 
     <div class="instr-section">
       <h2><span class="step-num">4</span> Output Format</h2>
-      <p>Please list steps in order within each segment. Use the following format:</p>
+      <p>Please list steps in order within each segment. In each <strong>Step</strong> box we suggest stating the <strong>time range</strong> within that segment and the <strong>moment (second or mm:ss)</strong> when each action happens, then what occurs.</p>
       <div class="instr-example">
         <strong>Example:</strong><br/>
-        <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
-        <strong>Step 2:</strong> She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
-        <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+        <strong>Step 1:</strong> 0:00–0:08: She attaches a disposable tip to a P200 micropipette.<br/>
+        <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
+        <strong>Step 3:</strong> 0:22–0:26: She caps the receiving tube and inverts it three times to mix.
       </div>
     </div>
 
@@ -831,7 +831,7 @@
       <ol>
         <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
-        <li>Write your step-by-step description in the text box on the right.</li>
+        <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
         <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
@@ -927,12 +927,12 @@
 
       <div class="instr-section">
         <h2><span class="step-num">4</span> Output Format</h2>
-        <p>Please list steps in order within each segment. Use the following format:</p>
+        <p>Please list steps in order within each segment. In each <strong>Step</strong> box we suggest stating the <strong>time range</strong> within that segment and the <strong>moment (second or mm:ss)</strong> when each action happens, then what occurs.</p>
         <div class="instr-example">
           <strong>Example:</strong><br/>
-          <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
-          <strong>Step 2:</strong> She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
-          <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+          <strong>Step 1:</strong> 0:00–0:08: She attaches a disposable tip to a P200 micropipette.<br/>
+          <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
+          <strong>Step 3:</strong> 0:22–0:26: She caps the receiving tube and inverts it three times to mix.
         </div>
       </div>
 
@@ -941,7 +941,7 @@
         <ol>
           <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
-          <li>Write your step-by-step description in the text box on the right.</li>
+          <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
           <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
@@ -1036,7 +1036,7 @@
         </div>
         <div class="ann-field ann-field-steps">
           <span class="ann-label">4) Steps</span>
-          <p class="ann-help">Split this segment into ordered steps, one box per step. If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</p>
+          <p class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</p>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
         </div>
@@ -1213,6 +1213,7 @@ function createStepRow(value) {
   const ta = document.createElement('textarea');
   ta.className = 'ann-input step-input';
   ta.rows = 2;
+  ta.placeholder = 'e.g. 0:05–0:14: describe the action (give the time range or the second when it happens)';
   ta.value = value;
   const act = document.createElement('div');
   act.className = 'step-row-actions';
