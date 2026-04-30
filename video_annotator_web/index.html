@@ -437,6 +437,12 @@
       margin: 0;
       padding: 0;
     }
+    .ann-field-global-help {
+      padding-bottom: 2px;
+    }
+    .ann-field-global-help .ann-help {
+      margin-bottom: 4px;
+    }
     .ann-field-intro .ann-help {
       display: inline;
       font-size: .78rem;
@@ -1282,28 +1288,31 @@
       <div class="time-range" id="cardRange">0:00 – 0:30</div>
 
       <div class="annotation-fields-scroll" id="annotationFields">
+        <div class="ann-field ann-field-global-help">
+          <p class="ann-help">Applies to <strong>all</strong> fields below: if the category may apply but you cannot see the relevant detail clearly, write <code>[Not visible]</code>. If the category does not apply to this segment, write <code>N/A</code>.</p>
+        </div>
         <div class="ann-field">
           <div class="ann-field-intro">
-            <label class="ann-label" for="annEquipment">1) Equipment:</label> <span class="ann-help">Instruments and apparatus (pipettes, centrifuge, balance). If something may be present but you cannot see it clearly, write <code>[Not visible]</code>. If this category does not apply to this part of the video, write <code>N/A</code>.</span>
+            <label class="ann-label" for="annEquipment">1) Equipment:</label> <span class="ann-help">Instruments and apparatus (pipettes, centrifuge, balance).</span>
           </div>
           <textarea id="annEquipment" class="ann-input" rows="3" placeholder="e.g. P200 micropipette, microcentrifuge…"></textarea>
         </div>
         <div class="ann-field">
           <div class="ann-field-intro">
-            <label class="ann-label" for="annMaterials">2) Materials:</label> <span class="ann-help">Consumables, reagents, tubes, samples. If something may be there but is not clearly visible, write <code>[Not visible]</code>. If the question does not apply, write <code>N/A</code>.</span>
+            <label class="ann-label" for="annMaterials">2) Materials:</label> <span class="ann-help">Consumables, reagents, tubes, samples.</span>
           </div>
           <textarea id="annMaterials" class="ann-input" rows="3" placeholder="e.g. 1.5 mL tube, buffer, DNA sample…"></textarea>
         </div>
         <div class="ann-field ann-field-steps">
           <div class="ann-field-intro">
-            <span class="ann-label">3) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
+            <span class="ann-label">3) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. Include the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example &ldquo;0:12 to 0:18: she opens the tube&rdquo;). Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
           </div>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
         </div>
         <div class="ann-field">
           <div class="ann-field-intro">
-            <label class="ann-label" for="annVisualizedResults">4) Visualized results:</label> <span class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</span>
+            <label class="ann-label" for="annVisualizedResults">4) Visualized results:</label> <span class="ann-help">Observable outcomes (color, precipitate, bands, phase).</span>
           </div>
           <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
         </div>
