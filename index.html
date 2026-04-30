@@ -454,6 +454,25 @@
     .extra-note-modal-inner {
       padding: 8px 24px 20px;
     }
+    .extra-note-modal textarea.ann-input {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      box-sizing: border-box;
+      min-height: 120px;
+      margin: 0;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .88rem;
+      resize: vertical;
+      transition: border-color .15s;
+    }
+    .extra-note-modal textarea.ann-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
     .extra-note-modal-time {
       font-size: .9rem;
       color: var(--text-muted);
