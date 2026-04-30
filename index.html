@@ -704,7 +704,7 @@
     <div class="instr-section">
       <h2><span class="step-num">5</span> How This Tool Works</h2>
       <ol>
-        <li>Each video is split into <strong>30-second segments</strong>.</li>
+        <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
         <li>Write your step-by-step description in the text box on the right.</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
@@ -814,7 +814,7 @@
       <div class="instr-section">
         <h2><span class="step-num">5</span> How This Tool Works</h2>
         <ol>
-          <li>Each video is split into <strong>30-second segments</strong>.</li>
+          <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
           <li>Write your step-by-step description in the text box on the right.</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
@@ -907,18 +907,23 @@
   </div>
 </div>
 
+<!-- Parse per-video segment tables (.xlsx or .csv next to each .mp4) -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 /* ================================================================
    CONFIGURATION — edit this list to add/remove videos.
    Each entry: { id, label, src }
    "src" is relative to this HTML file (or an absolute URL).
+   Place a segment table next to each .mp4: same basename with .xlsx or .csv
+   (columns start and end in seconds; optional step label e.g. action sentence).
+   If neither file exists, the app falls back to fixed-length chunks.
    ================================================================ */
 const VIDEOS = [
   { id: 'extractdna_1',      label: 'Extract DNA 1',     src: 'videos/extractdna_1.mp4' },
   { id: 'electrophoresis_1', label: 'Electrophoresis 1', src: 'videos/electrophoresis_1.mp4' },
 ];
 
-const SEGMENT_DURATION = 30; // seconds per segment
+const SEGMENT_DURATION = 30; // fallback seconds per segment if no spreadsheet
 
 const GITHUB_REPO  = 'AnitaGhandehari/AutoLab_Annotator';
 const _k = ['Z2l0aHViX3BhdF8xMUFNSDNHS1Ew','SmhTNnRvUHMzSFdyX1U2YnNPQjlX','S3J0Z1RqblozYnRYTjZ4UzJVYVZC','emk4ajh5VUM1S0dUZ21DS1o0RVAy','NWo0MTA0RUtJ'];
@@ -936,6 +941,7 @@ let annotations  = {};  // { segmentIdx: "text" }  for current video
 let currentIdx   = 0;
 let totalSegs    = 0;
 let currentVideoId = '';
+let segmentSource = 'default'; // 'spreadsheet' | 'default'
 let currentUser  = null; // { first, last }
 let initialized  = false;
 
@@ -974,6 +980,149 @@ function flash(msg) {
   const el = document.getElementById('status');
   el.textContent = msg;
   setTimeout(() => el.textContent = '', 2500);
+}
+
+function normKey(name) {
+  return String(name).trim().toLowerCase().replace(/\s+/g, '_');
+}
+
+function parseTimeToSeconds(val) {
+  if (val === '' || val === null || val === undefined) return null;
+  if (typeof val === 'number' && Number.isFinite(val)) return val;
+  const s = String(val).trim();
+  if (!s) return null;
+  if (s.includes(':')) {
+    const parts = s.replace(/,/g, '.').split(':').map((p) => parseFloat(p));
+    if (parts.some((x) => !Number.isFinite(x))) return null;
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return null;
+  }
+  const n = parseFloat(s.replace(/,/g, '.'));
+  return Number.isFinite(n) ? n : null;
+}
+
+function pickColumn(colByKey, candidates) {
+  for (const c of candidates) {
+    const k = normKey(c);
+    if (colByKey[k] !== undefined) return colByKey[k];
+  }
+  return null;
+}
+
+function parseSegmentWorkbook(workbook, dur, sheetFile) {
+  const sheetName = workbook.SheetNames?.[0];
+  if (!sheetName) {
+    return { segments: [], error: 'Spreadsheet has no sheets.' };
+  }
+  const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+  if (!rows.length) {
+    return { segments: [], error: 'Spreadsheet is empty.' };
+  }
+  const headers = Object.keys(rows[0]);
+  if (headers.length < 2) {
+    return { segments: [], error: 'Need at least two columns (start and end).' };
+  }
+  const colByKey = {};
+  for (const h of headers) {
+    colByKey[normKey(h)] = h;
+  }
+  const startCol = pickColumn(colByKey, [
+    'start', 'start_sec', 'start_time', 't_start', 'time_start', 'begin', 'from',
+    'start_(s)', 'start_s',
+  ]);
+  const endCol = pickColumn(colByKey, [
+    'end', 'end_sec', 'end_time', 't_end', 'time_end', 'stop', 'to',
+    'end_(s)', 'end_s',
+  ]);
+  if (!startCol || !endCol) {
+    return { segments: [], error: `Could not find start/end columns. Found: ${headers.join(', ')}` };
+  }
+  const labelCol = pickColumn(colByKey, [
+    'step', 'label', 'name', 'phase', 'description', 'procedure', 'activity',
+    'action_sentence',
+  ]);
+  const raw = [];
+  for (const row of rows) {
+    let start = parseTimeToSeconds(row[startCol]);
+    let end = parseTimeToSeconds(row[endCol]);
+    if (start === null || end === null) continue;
+    if (end < start) [start, end] = [end, start];
+    let label = null;
+    if (labelCol) {
+      const t = row[labelCol];
+      if (t !== '' && t !== null && t !== undefined) {
+        label = String(t).trim() || null;
+      }
+    }
+    raw.push({
+      start: Math.max(0, Math.min(start, dur)),
+      end: Math.max(0, Math.min(end, dur)),
+      label,
+    });
+  }
+  const filtered = raw.filter((r) => r.end > r.start);
+  if (!filtered.length) {
+    return { segments: [], error: 'No valid start/end rows after parsing.' };
+  }
+  filtered.sort((a, b) => a.start - b.start);
+  const segments = filtered.map((r, i) => ({
+    idx: i,
+    start: r.start,
+    end: r.end,
+    ...(r.label ? { label: r.label } : {}),
+  }));
+  return { segments, error: null, sheetFile };
+}
+
+/**
+ * Loads rows from videos/<same-name>.xlsx or .csv (same folder as the .mp4).
+ */
+async function loadSegmentsFromSpreadsheet(entry, dur) {
+  if (typeof XLSX === 'undefined') {
+    return { segments: [], error: 'Spreadsheet library failed to load (offline?).' };
+  }
+  const base = entry.src.replace(/\.mp4$/i, '');
+  const candidates = [
+    { ext: '.xlsx', as: 'array' },
+    { ext: '.csv', as: 'string' },
+  ];
+  let lastError = null;
+  for (const { ext, as } of candidates) {
+    const url = base + ext;
+    let res;
+    try {
+      res = await fetch(url);
+    } catch {
+      lastError = `Could not fetch ${url.split('/').pop()}`;
+      continue;
+    }
+    if (!res.ok) {
+      lastError = `No segment file: ${url.split('/').pop()}`;
+      continue;
+    }
+    let workbook;
+    try {
+      if (as === 'string') {
+        const text = await res.text();
+        workbook = XLSX.read(text, { type: 'string' });
+      } else {
+        const buf = await res.arrayBuffer();
+        workbook = XLSX.read(buf, { type: 'array' });
+      }
+    } catch (e) {
+      lastError = `Could not read ${ext}: ${e}`;
+      continue;
+    }
+    const fileName = url.split('/').pop();
+    const parsed = parseSegmentWorkbook(workbook, dur, fileName);
+    if (parsed.segments.length > 0) return parsed;
+    lastError = parsed.error;
+  }
+  return {
+    segments: [],
+    error: lastError || 'No segment table (.xlsx or .csv) next to the video.',
+  };
 }
 
 /* ================================================================
@@ -1095,16 +1244,40 @@ videoSelect.addEventListener('change', () => switchVideo(videoSelect.value));
 /* ================================================================
    INIT AFTER VIDEO METADATA LOADED
    ================================================================ */
-vid.addEventListener('loadedmetadata', () => {
+vid.addEventListener('loadedmetadata', async () => {
   const dur = vid.duration;
-  totalSegs = Math.ceil(dur / SEGMENT_DURATION);
-  document.getElementById('totalSegments').textContent = `${totalSegs} segments`;
-
+  const videoIdWhenLoaded = currentVideoId;
+  const entry = VIDEOS.find((v) => v.id === videoIdWhenLoaded);
+  segmentSource = 'default';
   segments = [];
-  for (let i = 0; i < totalSegs; i++) {
-    const start = i * SEGMENT_DURATION;
-    const end   = Math.min((i + 1) * SEGMENT_DURATION, dur);
-    segments.push({ idx: i, start, end });
+
+  let sheetMsg = null;
+  if (entry) {
+    const parsed = await loadSegmentsFromSpreadsheet(entry, dur);
+    if (videoIdWhenLoaded !== currentVideoId) return;
+    if (parsed.segments.length > 0) {
+      segments = parsed.segments;
+      segmentSource = 'spreadsheet';
+      document.getElementById('totalSegments').textContent =
+        `${segments.length} segments (${parsed.sheetFile})`;
+    } else {
+      sheetMsg = parsed.error;
+    }
+  }
+
+  if (segments.length === 0) {
+    totalSegs = Math.max(1, Math.ceil(dur / SEGMENT_DURATION));
+    document.getElementById('totalSegments').textContent =
+      `${totalSegs} segments × ${SEGMENT_DURATION} s (fixed window)`;
+    segments = [];
+    for (let i = 0; i < totalSegs; i++) {
+      const start = i * SEGMENT_DURATION;
+      const end = Math.min((i + 1) * SEGMENT_DURATION, dur);
+      segments.push({ idx: i, start, end });
+    }
+    if (sheetMsg) flash(sheetMsg);
+  } else {
+    totalSegs = segments.length;
   }
 
   loadAnnotationsLocal();
@@ -1152,9 +1325,10 @@ function buildSegmentList() {
     const item = document.createElement('div');
     item.className = 'seg-item';
     item.dataset.idx = seg.idx;
+    const title = seg.label ? seg.label : `Segment ${seg.idx + 1}`;
     item.innerHTML = `
       <span class="dot"></span>
-      <span>Segment ${seg.idx + 1}</span>
+      <span>${title}</span>
       <span class="seg-time">${fmt(seg.start)} – ${fmt(seg.end)}</span>
     `;
     item.addEventListener('click', () => goToSegment(seg.idx));
@@ -1197,8 +1371,11 @@ function goToSegment(idx) {
   vid.currentTime = seg.start;
 
   document.getElementById('segLabel').textContent =
-    `Segment ${currentIdx + 1} / ${totalSegs}`;
-  document.getElementById('cardTitle').textContent = `Segment ${currentIdx + 1}`;
+    seg.label
+      ? `${seg.label} (${currentIdx + 1} / ${totalSegs})`
+      : `Segment ${currentIdx + 1} / ${totalSegs}`;
+  document.getElementById('cardTitle').textContent =
+    seg.label || `Segment ${currentIdx + 1}`;
   document.getElementById('cardRange').textContent =
     `${fmt(seg.start)} – ${fmt(seg.end)}`;
   document.getElementById('explanation').value = annotations[currentIdx] || '';
@@ -1288,10 +1465,12 @@ document.getElementById('btnExport').addEventListener('click', () => {
     annotator: `${currentUser.first} ${currentUser.last}`,
     video: currentVideoId,
     video_label: entry ? entry.label : currentVideoId,
-    segment_duration_sec: SEGMENT_DURATION,
+    segment_source: segmentSource,
+    segment_duration_sec: segmentSource === 'spreadsheet' ? null : SEGMENT_DURATION,
     annotated_at: new Date().toISOString(),
     segments: segments.map(seg => ({
       segment: seg.idx + 1,
+      step_label: seg.label || null,
       start: fmt(seg.start),
       end: fmt(seg.end),
       explanation: annotations[seg.idx] || null,
@@ -1316,10 +1495,12 @@ function buildExportData() {
     annotator: `${currentUser.first} ${currentUser.last}`,
     video: currentVideoId,
     video_label: entry ? entry.label : currentVideoId,
-    segment_duration_sec: SEGMENT_DURATION,
+    segment_source: segmentSource,
+    segment_duration_sec: segmentSource === 'spreadsheet' ? null : SEGMENT_DURATION,
     annotated_at: new Date().toISOString(),
     segments: segments.map(seg => ({
       segment: seg.idx + 1,
+      step_label: seg.label || null,
       start: fmt(seg.start),
       end: fmt(seg.end),
       explanation: annotations[seg.idx] || null,
