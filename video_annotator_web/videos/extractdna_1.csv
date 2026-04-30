@@ -1,0 +1,6 @@
+﻿action sentence,start,end
+Add 180 ml of 50 mM NaOH,1,37
+Vortex the material,40,47
+Incubate at 95° C for 5 min,55,67
+Spin down to collect the material at the bottom of the tube,77,113
+"Add 20 μl of 1 M Tris-HCl, pH 8.0",122,146

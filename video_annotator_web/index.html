@@ -704,7 +704,7 @@
     <div class="instr-section">
       <h2><span class="step-num">5</span> How This Tool Works</h2>
       <ol>
-        <li>Each video uses a matching <strong>Excel file</strong> (<code>videos/&lt;name&gt;.xlsx</code>) with <strong>start</strong> and <strong>end</strong> times per step; if that file is missing, the app falls back to 30-second chunks.</li>
+        <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
         <li>Write your step-by-step description in the text box on the right.</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
@@ -814,7 +814,7 @@
       <div class="instr-section">
         <h2><span class="step-num">5</span> How This Tool Works</h2>
         <ol>
-          <li>Each video uses a matching <strong>Excel file</strong> (<code>videos/&lt;name&gt;.xlsx</code>) with <strong>start</strong> and <strong>end</strong> times per step; if that file is missing, the app falls back to 30-second chunks.</li>
+          <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
           <li>Write your step-by-step description in the text box on the right.</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
@@ -907,22 +907,23 @@
   </div>
 </div>
 
-<!-- Parse per-video segment tables (videos/<id>.xlsx next to each .mp4) -->
+<!-- Parse per-video segment tables (.xlsx or .csv next to each .mp4) -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 /* ================================================================
    CONFIGURATION — edit this list to add/remove videos.
    Each entry: { id, label, src }
    "src" is relative to this HTML file (or an absolute URL).
-   Place a segment table at the same path with a .xlsx extension, e.g.
-   videos/extractdna_1.xlsx (Start/End columns; optional Step/Label).
+   Place a segment table next to each .mp4: same basename with .xlsx or .csv
+   (columns start and end in seconds; optional step label e.g. action sentence).
+   If neither file exists, the app falls back to fixed-length chunks.
    ================================================================ */
 const VIDEOS = [
   { id: 'extractdna_1',      label: 'Extract DNA 1',     src: 'videos/extractdna_1.mp4' },
   { id: 'electrophoresis_1', label: 'Electrophoresis 1', src: 'videos/electrophoresis_1.mp4' },
 ];
 
-const SEGMENT_DURATION = 30; // fallback seconds per segment if no .xlsx
+const SEGMENT_DURATION = 30; // fallback seconds per segment if no spreadsheet
 
 const GITHUB_REPO  = 'AnitaGhandehari/AutoLab_Annotator';
 const _k = ['Z2l0aHViX3BhdF8xMUFNSDNHS1Ew','SmhTNnRvUHMzSFdyX1U2YnNPQjlX','S3J0Z1RqblozYnRYTjZ4UzJVYVZC','emk4ajh5VUM1S0dUZ21DS1o0RVAy','NWo0MTA0RUtJ'];
@@ -940,7 +941,7 @@ let annotations  = {};  // { segmentIdx: "text" }  for current video
 let currentIdx   = 0;
 let totalSegs    = 0;
 let currentVideoId = '';
-let segmentSource = 'default'; // 'excel' | 'default'
+let segmentSource = 'default'; // 'spreadsheet' | 'default'
 let currentUser  = null; // { first, last }
 let initialized  = false;
 
@@ -1009,31 +1010,8 @@ function pickColumn(colByKey, candidates) {
   return null;
 }
 
-/**
- * Loads rows from videos/<same-name>.xlsx; same column rules as video_annotator/server.py
- */
-async function loadSegmentsFromSpreadsheet(entry, dur) {
-  if (typeof XLSX === 'undefined') {
-    return { segments: [], error: 'Spreadsheet library failed to load (offline?).' };
-  }
-  const xlsxUrl = entry.src.replace(/\.mp4$/i, '.xlsx');
-  let res;
-  try {
-    res = await fetch(xlsxUrl);
-  } catch {
-    return { segments: [], error: `Could not fetch ${xlsxUrl}` };
-  }
-  if (!res.ok) {
-    return { segments: [], error: `No segment file: ${xlsxUrl.split('/').pop()}` };
-  }
-  let workbook;
-  try {
-    const buf = await res.arrayBuffer();
-    workbook = XLSX.read(buf, { type: 'array' });
-  } catch (e) {
-    return { segments: [], error: `Could not read spreadsheet: ${e}` };
-  }
-  const sheetName = workbook.SheetNames[0];
+function parseSegmentWorkbook(workbook, dur, sheetFile) {
+  const sheetName = workbook.SheetNames?.[0];
   if (!sheetName) {
     return { segments: [], error: 'Spreadsheet has no sheets.' };
   }
@@ -1062,6 +1040,7 @@ async function loadSegmentsFromSpreadsheet(entry, dur) {
   }
   const labelCol = pickColumn(colByKey, [
     'step', 'label', 'name', 'phase', 'description', 'procedure', 'activity',
+    'action_sentence',
   ]);
   const raw = [];
   for (const row of rows) {
@@ -1093,7 +1072,57 @@ async function loadSegmentsFromSpreadsheet(entry, dur) {
     end: r.end,
     ...(r.label ? { label: r.label } : {}),
   }));
-  return { segments, error: null, sheetFile: xlsxUrl.split('/').pop() };
+  return { segments, error: null, sheetFile };
+}
+
+/**
+ * Loads rows from videos/<same-name>.xlsx or .csv (same folder as the .mp4).
+ */
+async function loadSegmentsFromSpreadsheet(entry, dur) {
+  if (typeof XLSX === 'undefined') {
+    return { segments: [], error: 'Spreadsheet library failed to load (offline?).' };
+  }
+  const base = entry.src.replace(/\.mp4$/i, '');
+  const candidates = [
+    { ext: '.xlsx', as: 'array' },
+    { ext: '.csv', as: 'string' },
+  ];
+  let lastError = null;
+  for (const { ext, as } of candidates) {
+    const url = base + ext;
+    let res;
+    try {
+      res = await fetch(url);
+    } catch {
+      lastError = `Could not fetch ${url.split('/').pop()}`;
+      continue;
+    }
+    if (!res.ok) {
+      lastError = `No segment file: ${url.split('/').pop()}`;
+      continue;
+    }
+    let workbook;
+    try {
+      if (as === 'string') {
+        const text = await res.text();
+        workbook = XLSX.read(text, { type: 'string' });
+      } else {
+        const buf = await res.arrayBuffer();
+        workbook = XLSX.read(buf, { type: 'array' });
+      }
+    } catch (e) {
+      lastError = `Could not read ${ext}: ${e}`;
+      continue;
+    }
+    const fileName = url.split('/').pop();
+    const parsed = parseSegmentWorkbook(workbook, dur, fileName);
+    if (parsed.segments.length > 0) return parsed;
+    lastError = parsed.error;
+  }
+  return {
+    segments: [],
+    error: lastError || 'No segment table (.xlsx or .csv) next to the video.',
+  };
 }
 
 /* ================================================================
@@ -1228,7 +1257,7 @@ vid.addEventListener('loadedmetadata', async () => {
     if (videoIdWhenLoaded !== currentVideoId) return;
     if (parsed.segments.length > 0) {
       segments = parsed.segments;
-      segmentSource = 'excel';
+      segmentSource = 'spreadsheet';
       document.getElementById('totalSegments').textContent =
         `${segments.length} segments (${parsed.sheetFile})`;
     } else {
@@ -1437,7 +1466,7 @@ document.getElementById('btnExport').addEventListener('click', () => {
     video: currentVideoId,
     video_label: entry ? entry.label : currentVideoId,
     segment_source: segmentSource,
-    segment_duration_sec: segmentSource === 'excel' ? null : SEGMENT_DURATION,
+    segment_duration_sec: segmentSource === 'spreadsheet' ? null : SEGMENT_DURATION,
     annotated_at: new Date().toISOString(),
     segments: segments.map(seg => ({
       segment: seg.idx + 1,
@@ -1467,7 +1496,7 @@ function buildExportData() {
     video: currentVideoId,
     video_label: entry ? entry.label : currentVideoId,
     segment_source: segmentSource,
-    segment_duration_sec: segmentSource === 'excel' ? null : SEGMENT_DURATION,
+    segment_duration_sec: segmentSource === 'spreadsheet' ? null : SEGMENT_DURATION,
     annotated_at: new Date().toISOString(),
     segments: segments.map(seg => ({
       segment: seg.idx + 1,

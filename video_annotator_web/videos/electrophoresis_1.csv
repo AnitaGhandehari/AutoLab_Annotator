@@ -1,0 +1,8 @@
+﻿action sentence,start,end
+Place the agarose gel into the gel box (electrophoresis unit).,3,10
+Fill gel box with TAE until the gel is covered.,17,79
+Mix the DNA sample with Loading buffer at 1:25 dilution ratio.,93,236
+Load 5 μL of DNA ladder and samples into wells. ,244,356
+Run the gel at 100 V until the dye line is approximately 75-80% of the way down the gel.,357,396
+Turn off power.,400,408
+Visualize the DNA fragments with LED.,436,481
