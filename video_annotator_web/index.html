@@ -1011,12 +1011,11 @@
 
     <div class="instr-section">
       <h2><span class="step-num">4</span> Output Format</h2>
-      <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the five panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
+      <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the four panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
       <ul>
         <li><strong>equipment</strong> — apparatus and instruments you see.</li>
         <li><strong>materials</strong> — consumables, reagents, tubes, samples.</li>
-        <li><strong>actions</strong> — what the person does; prefer specific verbs.</li>
-        <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it.</li>
+        <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
         <li><strong>visualized_results</strong> — observable outcomes (color, bands, precipitate, phases).</li>
       </ul>
       <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
@@ -1024,7 +1023,7 @@
       <ul>
         <li><code>[Not visible]</code> — this field might apply, but you cannot clearly see the relevant detail on screen.</li>
         <li><code>N/A</code> — this field does not apply to this segment.</li>
-        <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. Common in <strong>Actions</strong> (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
+        <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
       </ul>
       <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
       <div class="instr-example">
@@ -1040,7 +1039,7 @@
       <ol>
         <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
-        <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
+        <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Steps</strong> (with times inside the segment when each part happens), and <strong>Visualized results</strong>.</li>
         <li>Optional: the <strong>Extra Note</strong> button (pink, next to <strong>Replay</strong>) saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
@@ -1138,12 +1137,11 @@
 
       <div class="instr-section">
         <h2><span class="step-num">4</span> Output Format</h2>
-        <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the five panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
+        <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the four panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
         <ul>
           <li><strong>equipment</strong> — apparatus and instruments you see.</li>
           <li><strong>materials</strong> — consumables, reagents, tubes, samples.</li>
-          <li><strong>actions</strong> — what the person does; prefer specific verbs.</li>
-          <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it.</li>
+          <li><strong>steps</strong> — ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
           <li><strong>visualized_results</strong> — observable outcomes (color, bands, precipitate, phases).</li>
         </ul>
         <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
@@ -1151,7 +1149,7 @@
         <ul>
           <li><code>[Not visible]</code> — this field might apply, but you cannot clearly see the relevant detail on screen.</li>
           <li><code>N/A</code> — this field does not apply to this segment.</li>
-          <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. Common in <strong>Actions</strong> (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
+          <li><code>[Unclear]</code> — something is happening but you are not sure what; say what you can see. You can use this in <strong>Steps</strong> when the motion is ambiguous (for example <code>[Unclear: adds a white powder from a spatula]</code>).</li>
         </ul>
         <p>For a <strong>missing number or unit</strong> that the protocol would normally specify but the video never shows (duration, rpm, temperature, etc.), write <code>[Not Visible Parameter]</code> in the sentence, as in section 3.</p>
         <div class="instr-example">
@@ -1167,7 +1165,7 @@
         <ol>
           <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
-          <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
+          <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Steps</strong> (with times inside the segment when each part happens), and <strong>Visualized results</strong>.</li>
           <li>Optional: the <strong>Extra Note</strong> button (pink, next to <strong>Replay</strong>) saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
@@ -1296,22 +1294,16 @@
           </div>
           <textarea id="annMaterials" class="ann-input" rows="3" placeholder="e.g. 1.5 mL tube, buffer, DNA sample…"></textarea>
         </div>
-        <div class="ann-field">
-          <div class="ann-field-intro">
-            <label class="ann-label" for="annActions">3) Actions:</label> <span class="ann-help">What the person does, with clear verbs (pipettes, vortexes, caps). If you cannot see clearly what they are doing, write <code>[Not visible]</code>. If there is no action to describe here, write <code>N/A</code>. If something happens but you are unsure what, use <code>[Unclear]</code> and say what you can see.</span>
-          </div>
-          <textarea id="annActions" class="ann-input" rows="3" placeholder="e.g. She aspirates 20 µL and dispenses into a second tube…"></textarea>
-        </div>
         <div class="ann-field ann-field-steps">
           <div class="ann-field-intro">
-            <span class="ann-label">4) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
+            <span class="ann-label">3) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. We suggest including the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example "0:12 to 0:18: she opens the tube"). If a step is not clearly visible, write <code>[Not visible]</code>. If a step does not apply, write <code>N/A</code>. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
           </div>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
         </div>
         <div class="ann-field">
           <div class="ann-field-intro">
-            <label class="ann-label" for="annVisualizedResults">5) Visualized results:</label> <span class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</span>
+            <label class="ann-label" for="annVisualizedResults">4) Visualized results:</label> <span class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</span>
           </div>
           <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
         </div>
@@ -1397,7 +1389,6 @@ function emptyStructuredAnnotation() {
   return {
     equipment: '',
     materials: '',
-    actions: '',
     steps: [''],
     visualized_results: '',
     extra_notes: {},
@@ -1424,7 +1415,7 @@ function isAnnotationEmpty(obj) {
   if (obj == null) return true;
   if (typeof obj === 'string') return !String(obj).trim();
   if (typeof obj !== 'object') return true;
-  for (const f of ['equipment', 'materials', 'actions', 'visualized_results']) {
+  for (const f of ['equipment', 'materials', 'visualized_results']) {
     if (obj[f] && String(obj[f]).trim()) return false;
   }
   const steps = obj.steps;
@@ -1446,8 +1437,7 @@ function normalizeSegmentAnnotation(val) {
     return {
       equipment: '',
       materials: '',
-      actions: t,
-      steps: [''],
+      steps: [t],
       visualized_results: '',
       extra_notes: {},
     };
@@ -1458,11 +1448,15 @@ function normalizeSegmentAnnotation(val) {
     if (Array.isArray(stepsRaw) && stepsRaw.length) {
       steps = stepsRaw.map((s) => String(s == null ? '' : s));
     }
+    const legacyActions = String(val.actions ?? '').trim();
+    const stepsAllEmpty = !steps.some((s) => String(s || '').trim());
+    if (legacyActions && stepsAllEmpty) {
+      steps = [legacyActions];
+    }
     const extra_notes = normalizeExtraNotesMap(val.extra_notes ?? val.Extra_Notes);
     return {
       equipment: String(val.equipment ?? '').trim(),
       materials: String(val.materials ?? '').trim(),
-      actions: String(val.actions ?? '').trim(),
       steps,
       visualized_results: String(val.visualized_results ?? val.visualizedResults ?? '').trim(),
       extra_notes,
@@ -1636,7 +1630,6 @@ function writeAnnotationToForm(ann) {
   const a = normalizeSegmentAnnotation(ann);
   document.getElementById('annEquipment').value = a.equipment;
   document.getElementById('annMaterials').value = a.materials;
-  document.getElementById('annActions').value = a.actions;
   document.getElementById('annVisualizedResults').value = a.visualized_results;
   renderStepsFromData(a.steps);
 }
@@ -1650,7 +1643,6 @@ function readStructuredAnnotationFromForm() {
   return {
     equipment: document.getElementById('annEquipment').value.trim(),
     materials: document.getElementById('annMaterials').value.trim(),
-    actions: document.getElementById('annActions').value.trim(),
     steps: steps.length ? steps : [''],
     visualized_results: document.getElementById('annVisualizedResults').value.trim(),
     extra_notes: prevExtra,
@@ -1706,7 +1698,7 @@ function buildSegmentExportSlice(segIdx) {
     ...base,
     equipment: ann.equipment.trim() || null,
     materials: ann.materials.trim() || null,
-    actions: ann.actions.trim() || null,
+    actions: null,
     steps: stepList,
     visualized_results: ann.visualized_results.trim() || null,
     Extra_Notes: hasExtra ? extraSorted : null,
@@ -1716,7 +1708,7 @@ function buildSegmentExportSlice(segIdx) {
 function segmentExportHasContent(s) {
   const extra = s && s.Extra_Notes && typeof s.Extra_Notes === 'object';
   const extraKeys = extra && Object.keys(s.Extra_Notes).length > 0;
-  return s.equipment != null || s.materials != null || s.actions != null
+  return s.equipment != null || s.materials != null
     || (Array.isArray(s.steps) && s.steps.length > 0) || s.visualized_results != null
     || extraKeys;
 }
@@ -2333,7 +2325,6 @@ document.getElementById('extraNoteModalPanel').addEventListener('click', (e) => 
 document.getElementById('btnClear').addEventListener('click', () => {
   document.getElementById('annEquipment').value = '';
   document.getElementById('annMaterials').value = '';
-  document.getElementById('annActions').value = '';
   document.getElementById('annVisualizedResults').value = '';
   renderStepsFromData(['']);
   delete annotations[currentIdx];
