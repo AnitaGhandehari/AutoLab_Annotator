@@ -97,9 +97,11 @@
     }
     .login-error {
       color: var(--danger);
-      font-size: .82rem;
+      font-size: .88rem;
+      font-weight: 600;
       margin-bottom: 12px;
-      min-height: 1.2em;
+      min-height: 1.3em;
+      line-height: 1.35;
     }
 
     /* ---- Header ---- */
@@ -655,13 +657,13 @@
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <h1>AutoLab Annotator</h1>
-    <p>Enter your name to begin annotating.</p>
+    <p>Enter your first and last name to begin. If you only use one name, fill the first box and leave the second empty.</p>
     <label for="firstName">First Name</label>
     <input type="text" id="firstName" placeholder="e.g. Jane" autocomplete="given-name" />
-    <label for="lastName">Last Name</label>
+    <label for="lastName">Last Name <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
     <input type="text" id="lastName" placeholder="e.g. Smith" autocomplete="family-name" />
     <div class="login-error" id="loginError"></div>
-    <button class="login-btn" id="loginBtn">Start Annotating</button>
+    <button type="button" class="login-btn" id="loginBtn">Start Annotating</button>
   </div>
 </div>
 
@@ -990,7 +992,12 @@ const SEGMENT_DURATION = 30; // fallback seconds per segment if no spreadsheet
 
 const GITHUB_REPO  = 'AnitaGhandehari/AutoLab_Annotator';
 const _k = ['Z2l0aHViX3BhdF8xMUFNSDNHS1Ew','SmhTNnRvUHMzSFdyX1U2YnNPQjlX','S3J0Z1RqblozYnRYTjZ4UzJVYVZC','emk4ajh5VUM1S0dUZ21DS1o0RVAy','NWo0MTA0RUtJ'];
-const GITHUB_TOKEN = atob(_k.join(''));
+let GITHUB_TOKEN = '';
+try {
+  GITHUB_TOKEN = atob(_k.join(''));
+} catch (_) {
+  console.warn('Could not decode GitHub token');
+}
 const NOTIFY_EMAIL = 'ani.ghandehari@gmail.com';
 
 /* ---- DOM refs ---- */
@@ -1018,7 +1025,9 @@ let initialized  = false;
    Key format: "autolab_<first>_<last>_<videoId>"
    ================================================================ */
 function storageKey(videoId) {
-  return `autolab_${currentUser.first}_${currentUser.last}_${videoId || currentVideoId}`;
+  const l = (currentUser.last || '').trim();
+  const lastPart = l || '_single';
+  return `autolab_${currentUser.first}_${lastPart}_${videoId || currentVideoId}`;
 }
 
 function saveAnnotationsLocal() {
@@ -1196,16 +1205,41 @@ async function loadSegmentsFromSpreadsheet(entry, dur) {
 /* ================================================================
    LOGIN
    ================================================================ */
+function displayUserName() {
+  if (!currentUser) return '';
+  const f = (currentUser.first || '').trim();
+  const l = (currentUser.last || '').trim();
+  return l ? `${f} ${l}` : f;
+}
+
+/** Safe for filenames (no spaces). */
+function annotatorSlug() {
+  const f = (currentUser.first || '').trim().replace(/\s+/g, '_');
+  const l = (currentUser.last || '').trim().replace(/\s+/g, '_');
+  return l ? `${f}_${l}` : f;
+}
+
 function checkExistingSession() {
-  const saved = localStorage.getItem('autolab_user');
-  if (saved) {
-    currentUser = JSON.parse(saved);
+  try {
+    const saved = localStorage.getItem('autolab_user');
+    if (!saved) return;
+    const parsed = JSON.parse(saved);
+    if (!parsed || typeof parsed.first !== 'string' || !parsed.first.trim()) {
+      localStorage.removeItem('autolab_user');
+      return;
+    }
+    currentUser = {
+      first: parsed.first.trim(),
+      last: typeof parsed.last === 'string' ? parsed.last.trim() : '',
+    };
     if (localStorage.getItem('autolab_instructions_seen')) {
       document.getElementById('loginOverlay').classList.add('hidden');
       enterApp();
     } else {
       showInstructions();
     }
+  } catch {
+    try { localStorage.removeItem('autolab_user'); } catch (_) {}
   }
 }
 
@@ -1214,13 +1248,22 @@ document.getElementById('loginBtn').addEventListener('click', () => {
   const last  = document.getElementById('lastName').value.trim();
   const err   = document.getElementById('loginError');
 
-  if (!first || !last) {
-    err.textContent = 'Please enter both your first and last name.';
+  if (!first) {
+    err.textContent = 'Please enter at least your first name (you can skip last name).';
     return;
   }
 
+  err.textContent = '';
   currentUser = { first, last };
-  localStorage.setItem('autolab_user', JSON.stringify(currentUser));
+
+  try {
+    localStorage.setItem('autolab_user', JSON.stringify(currentUser));
+  } catch (e) {
+    err.textContent = 'This browser blocked saving your login (often in private mode). Try a regular window or allow site storage, then click again.';
+    console.error(e);
+    return;
+  }
+
   showInstructions();
 });
 
@@ -1273,7 +1316,7 @@ document.getElementById('btnStartAnnotating').addEventListener('click', () => {
 });
 
 function enterApp() {
-  document.getElementById('userDisplay').textContent = `${currentUser.first} ${currentUser.last}`;
+  document.getElementById('userDisplay').textContent = displayUserName();
   populateVideoList();
 }
 
@@ -1599,7 +1642,7 @@ document.getElementById('btnExport').addEventListener('click', () => {
   saveAnnotationsLocal();
   const entry = VIDEOS.find(v => v.id === currentVideoId);
   const exportData = {
-    annotator: `${currentUser.first} ${currentUser.last}`,
+    annotator: displayUserName(),
     video: currentVideoId,
     video_label: entry ? entry.label : currentVideoId,
     segment_source: segmentSource,
@@ -1616,7 +1659,7 @@ document.getElementById('btnExport').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `annotations_${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  a.download = `annotations_${currentVideoId}_${annotatorSlug()}.json`;
   a.click();
   flash('Exported!');
 });
@@ -1629,7 +1672,7 @@ function buildExportData() {
   saveAnnotationsLocal();
   const entry = VIDEOS.find(v => v.id === currentVideoId);
   return {
-    annotator: `${currentUser.first} ${currentUser.last}`,
+    annotator: displayUserName(),
     video: currentVideoId,
     video_label: entry ? entry.label : currentVideoId,
     segment_source: segmentSource,
@@ -1646,7 +1689,7 @@ function buildExportData() {
 }
 
 async function saveToGitHub(exportData) {
-  const fileName = `submissions/${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  const fileName = `submissions/${currentVideoId}_${annotatorSlug()}.json`;
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(exportData, null, 2))));
   const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${fileName}`;
 
@@ -1662,7 +1705,7 @@ async function saveToGitHub(exportData) {
   } catch {}
 
   const body = {
-    message: `Annotation: ${currentVideoId} by ${currentUser.first} ${currentUser.last}`,
+    message: `Annotation: ${currentVideoId} by ${displayUserName()}`,
     content,
   };
   if (sha) body.sha = sha;
@@ -1681,7 +1724,7 @@ async function saveToGitHub(exportData) {
 }
 
 async function sendEmailNotification(exportData) {
-  const fileName = `${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  const fileName = `${currentVideoId}_${annotatorSlug()}.json`;
   const githubFileUrl = `https://github.com/${GITHUB_REPO}/blob/main/submissions/${fileName}`;
   const rawFileUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/submissions/${fileName}`;
   const annotatedCount = exportData.segments.filter(s => s.explanation !== null).length;
@@ -1702,8 +1745,8 @@ async function sendEmailNotification(exportData) {
   ].join('\n');
 
   const formData = new FormData();
-  formData.append('name', `${currentUser.first} ${currentUser.last}`);
-  formData.append('_subject', `[AutoLab] ${exportData.video_label} annotated by ${currentUser.first} ${currentUser.last} (${annotatedCount}/${totalCount} segments)`);
+  formData.append('name', displayUserName());
+  formData.append('_subject', `[AutoLab] ${exportData.video_label} annotated by ${displayUserName()} (${annotatedCount}/${totalCount} segments)`);
   formData.append('message', emailBody);
   formData.append('_captcha', 'false');
   formData.append('_template', 'box');
