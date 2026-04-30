@@ -442,12 +442,40 @@
       background: var(--primary-hover);
     }
 
-    .keypoint-current-time {
-      font-size: .85rem;
-      margin-bottom: 8px;
+    .extra-note-modal {
+      background: var(--bg);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    }
+    .extra-note-modal-inner {
+      padding: 8px 24px 20px;
+    }
+    .extra-note-modal-time {
+      font-size: .9rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .extra-note-modal-time strong {
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .extra-note-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .extra-note-modal-list-title {
+      font-size: .82rem;
+      font-weight: 600;
+      margin: 20px 0 10px;
       color: var(--text-muted);
     }
-    .ann-field-keypoints .keypoint-row {
+    .extra-note-modal .keypoint-row {
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -457,13 +485,13 @@
       border-radius: 8px;
       border: 1px solid var(--border);
     }
-    .ann-field-keypoints .keypoint-time {
+    .extra-note-modal .keypoint-time {
       flex: 0 0 auto;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
       color: var(--primary);
     }
-    .ann-field-keypoints .keypoint-text {
+    .extra-note-modal .keypoint-text {
       flex: 1;
       font-size: .9rem;
       white-space: pre-wrap;
@@ -860,6 +888,7 @@
         <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
         <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
+        <li>Optional: click <strong>Extra note</strong> next to <strong>Replay</strong> at the exact frame you care about; type the note in the popup. It is stored under <code>Extra_Notes</code> (by <code>mm:ss</code>) for that segment in the export.</li>
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
         <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
@@ -970,6 +999,7 @@
           <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
           <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Actions</strong>, <strong>Steps</strong> (with times inside the segment when each action happens), and <strong>Visualized results</strong>.</li>
+          <li>Optional: click <strong>Extra note</strong> next to <strong>Replay</strong> at the exact frame you care about; type the note in the popup. It is stored under <code>Extra_Notes</code> (by <code>mm:ss</code>) for that segment in the export.</li>
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
           <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
@@ -985,6 +1015,25 @@
     </div>
     <div class="modal-close-bar">
       <button id="btnCloseModal">Got it, back to annotating</button>
+    </div>
+  </div>
+</div>
+
+<div class="instructions-modal-bg hidden" id="extraNoteModalBg" aria-hidden="true">
+  <div class="extra-note-modal" id="extraNoteModalPanel" role="dialog" aria-modal="true" aria-labelledby="extraNoteModalTitle">
+    <div class="instructions-header" style="padding: 18px 24px;">
+      <h2 id="extraNoteModalTitle" style="font-size:1.2rem;">Extra note</h2>
+      <p style="opacity:.9; font-size:.88rem; margin-top:4px;">The note is saved at the video time shown below (the time when you opened this window).</p>
+    </div>
+    <div class="extra-note-modal-inner">
+      <p class="extra-note-modal-time">Time in video: <strong id="extraNoteModalTimeLabel">0:00</strong></p>
+      <textarea id="extraNoteModalInput" class="ann-input" rows="4" placeholder="Type the extra information for this moment…" aria-label="Extra note text"></textarea>
+      <div class="extra-note-modal-actions">
+        <button type="button" class="btn-primary" id="btnExtraNoteSave">Save note</button>
+        <button type="button" class="btn-outline" id="btnExtraNoteCancel">Close</button>
+      </div>
+      <div class="extra-note-modal-list-title">Notes for this segment (exported as Extra_Notes)</div>
+      <div id="extraNotesModalList"></div>
     </div>
   </div>
 </div>
@@ -1032,6 +1081,7 @@
         <button class="btn-primary" id="btnPlay">Play</button>
         <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
         <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
+        <button class="btn-outline" id="btnExtraNote" title="Add an extra note at the current playback time">Extra note</button>
         <span class="segment-indicator" id="segLabel">Segment 1 / ...</span>
       </div>
     </div>
@@ -1072,14 +1122,6 @@
           <label class="ann-label" for="annVisualizedResults">5) Visualized results</label>
           <p class="ann-help">Observable outcomes (color, precipitate, bands, phase). If something might be there but is not clearly visible, write <code>[Not visible]</code>. If there is no result to report or it does not apply, write <code>N/A</code>.</p>
           <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
-        </div>
-        <div class="ann-field ann-field-keypoints">
-          <span class="ann-label">6) Key points</span>
-          <p class="ann-help">Short notes tied to an exact moment in the video. Pause or scrub to the right time, write the note below, then <strong>Add key point at current time</strong>. In the exported JSON these are grouped under <code>Extra_Notes</code> by timestamp (<code>mm:ss</code>).</p>
-          <div class="keypoint-current-time">Time used for the next key point: <strong id="keypointTimeLabel">0:00</strong></div>
-          <textarea id="annKeypointInput" class="ann-input" rows="2" placeholder="What happens at this moment?" aria-label="Key point note"></textarea>
-          <button type="button" class="btn-add-step" id="btnAddKeypoint" title="Attach note to the current playback time">Add key point at current time</button>
-          <div id="keypointsList"></div>
         </div>
       </div>
 
@@ -1146,6 +1188,9 @@ const videoSelect = document.getElementById('videoSelect');
 const stepsContainer = document.getElementById('stepsContainer');
 
 let timelineDrag = false;
+
+/** Video time (seconds) captured when opening the extra-note popup */
+let extraNoteCapturedAt = 0;
 
 let segments     = [];
 let annotations  = {};  // { segmentIdx: structured object } for current video
@@ -1316,7 +1361,7 @@ function readStepsFromForm() {
   return [...stepsContainer.querySelectorAll('.step-input')].map((ta) => ta.value.trim());
 }
 
-function createKeypointRow(timeKey, text) {
+function createExtraNoteModalRow(timeKey, text, indexInArr) {
   const wrap = document.createElement('div');
   wrap.className = 'keypoint-row';
   wrap.dataset.time = timeKey;
@@ -1330,38 +1375,83 @@ function createKeypointRow(timeKey, text) {
   rm.type = 'button';
   rm.className = 'btn-remove-step';
   rm.textContent = 'Remove';
-  rm.addEventListener('click', () => { wrap.remove(); });
+  rm.addEventListener('click', () => { removeExtraNoteAt(timeKey, indexInArr); });
   wrap.appendChild(timeEl);
   wrap.appendChild(textEl);
   wrap.appendChild(rm);
   return wrap;
 }
 
-function renderKeypointsFromData(extraMap) {
-  const list = document.getElementById('keypointsList');
+function renderExtraNotesModalList(extraMap) {
+  const list = document.getElementById('extraNotesModalList');
+  if (!list) return;
   list.innerHTML = '';
   const merged = normalizeExtraNotesMap(extraMap);
   const keys = Object.keys(merged).sort(
     (a, b) => (timeKeyToSec(a) || 0) - (timeKeyToSec(b) || 0),
   );
   keys.forEach((t) => {
-    merged[t].forEach((line) => {
-      list.appendChild(createKeypointRow(t, line));
+    merged[t].forEach((line, i) => {
+      list.appendChild(createExtraNoteModalRow(t, line, i));
     });
   });
 }
 
-function readExtraNotesFromForm() {
-  const map = {};
-  document.querySelectorAll('#keypointsList .keypoint-row').forEach((row) => {
-    const t = row.dataset.time;
-    const textEl = row.querySelector('.keypoint-text');
-    const text = textEl ? textEl.textContent.trim() : '';
-    if (!t || !text) return;
-    if (!map[t]) map[t] = [];
-    map[t].push(text);
-  });
-  return map;
+function removeExtraNoteAt(timeKey, indexInArr) {
+  const obj = readStructuredAnnotationFromForm();
+  const en = { ...normalizeExtraNotesMap(obj.extra_notes) };
+  if (!en[timeKey]) return;
+  en[timeKey] = en[timeKey].filter((_, i) => i !== indexInArr);
+  if (!en[timeKey].length) delete en[timeKey];
+  obj.extra_notes = en;
+  if (isAnnotationEmpty(obj)) delete annotations[currentIdx];
+  else annotations[currentIdx] = obj;
+  saveAnnotationsLocal();
+  renderExtraNotesModalList(normalizeExtraNotesMap(annotations[currentIdx]?.extra_notes));
+  refreshSegmentList();
+  updateProgress();
+}
+
+function openExtraNoteModal() {
+  extraNoteCapturedAt = vid.currentTime;
+  document.getElementById('extraNoteModalTimeLabel').textContent = fmt(extraNoteCapturedAt);
+  document.getElementById('extraNoteModalInput').value = '';
+  renderExtraNotesModalList(normalizeExtraNotesMap(annotations[currentIdx]?.extra_notes));
+  const bg = document.getElementById('extraNoteModalBg');
+  bg.classList.remove('hidden');
+  bg.setAttribute('aria-hidden', 'false');
+  if (!vid.paused) {
+    vid.pause();
+    updatePlayBtn();
+  }
+  document.getElementById('extraNoteModalInput').focus();
+}
+
+function closeExtraNoteModal() {
+  const bg = document.getElementById('extraNoteModalBg');
+  bg.classList.add('hidden');
+  bg.setAttribute('aria-hidden', 'true');
+}
+
+function saveExtraNoteFromModal() {
+  const text = document.getElementById('extraNoteModalInput').value.trim();
+  if (!text) {
+    flash('Write a note first.');
+    return;
+  }
+  const tKey = fmt(extraNoteCapturedAt);
+  const obj = readStructuredAnnotationFromForm();
+  const en = { ...normalizeExtraNotesMap(obj.extra_notes) };
+  if (!en[tKey]) en[tKey] = [];
+  en[tKey] = [...en[tKey], text];
+  obj.extra_notes = en;
+  annotations[currentIdx] = obj;
+  saveAnnotationsLocal();
+  document.getElementById('extraNoteModalInput').value = '';
+  renderExtraNotesModalList(en);
+  refreshSegmentList();
+  updateProgress();
+  flash('Extra note saved.');
 }
 
 function writeAnnotationToForm(ann) {
@@ -1370,20 +1460,22 @@ function writeAnnotationToForm(ann) {
   document.getElementById('annMaterials').value = a.materials;
   document.getElementById('annActions').value = a.actions;
   document.getElementById('annVisualizedResults').value = a.visualized_results;
-  document.getElementById('annKeypointInput').value = '';
   renderStepsFromData(a.steps);
-  renderKeypointsFromData(a.extra_notes);
 }
 
 function readStructuredAnnotationFromForm() {
   const steps = readStepsFromForm();
+  const prev = annotations[currentIdx];
+  const prevExtra = normalizeExtraNotesMap(
+    prev && typeof prev === 'object' ? (prev.extra_notes ?? prev.Extra_Notes) : {},
+  );
   return {
     equipment: document.getElementById('annEquipment').value.trim(),
     materials: document.getElementById('annMaterials').value.trim(),
     actions: document.getElementById('annActions').value.trim(),
     steps: steps.length ? steps : [''],
     visualized_results: document.getElementById('annVisualizedResults').value.trim(),
-    extra_notes: readExtraNotesFromForm(),
+    extra_notes: prevExtra,
   };
 }
 
@@ -1828,8 +1920,6 @@ function updateTimelineDisplay() {
   timelineThumb.style.left = `${pct}%`;
   const cur = document.getElementById('timelineCurrent');
   if (cur) cur.textContent = fmt(vid.currentTime);
-  const kpLbl = document.getElementById('keypointTimeLabel');
-  if (kpLbl) kpLbl.textContent = fmt(vid.currentTime);
 }
 
 function updateTimelineActiveShade() {
@@ -1885,6 +1975,7 @@ function selectSegment(idx, opts = {}) {
     saveAnnotationsLocal();
   }
   currentIdx = next;
+  closeExtraNoteModal();
   const seg = segments[currentIdx];
   if (seekToStart) {
     vid.currentTime = seg.start;
@@ -2042,15 +2133,23 @@ document.getElementById('btnAddStep').addEventListener('click', () => {
   renumberSteps();
 });
 
-document.getElementById('btnAddKeypoint').addEventListener('click', () => {
-  const text = document.getElementById('annKeypointInput').value.trim();
-  if (!text) {
-    flash('Write a key point first.');
-    return;
-  }
-  const tKey = fmt(vid.currentTime);
-  document.getElementById('keypointsList').appendChild(createKeypointRow(tKey, text));
-  document.getElementById('annKeypointInput').value = '';
+document.getElementById('btnExtraNote').addEventListener('click', () => {
+  openExtraNoteModal();
+});
+
+document.getElementById('btnExtraNoteSave').addEventListener('click', () => {
+  saveExtraNoteFromModal();
+});
+
+document.getElementById('btnExtraNoteCancel').addEventListener('click', () => {
+  closeExtraNoteModal();
+});
+
+document.getElementById('extraNoteModalBg').addEventListener('click', (e) => {
+  if (e.target.id === 'extraNoteModalBg') closeExtraNoteModal();
+});
+document.getElementById('extraNoteModalPanel').addEventListener('click', (e) => {
+  e.stopPropagation();
 });
 
 document.getElementById('btnClear').addEventListener('click', () => {
@@ -2058,9 +2157,7 @@ document.getElementById('btnClear').addEventListener('click', () => {
   document.getElementById('annMaterials').value = '';
   document.getElementById('annActions').value = '';
   document.getElementById('annVisualizedResults').value = '';
-  document.getElementById('annKeypointInput').value = '';
   renderStepsFromData(['']);
-  renderKeypointsFromData({});
   delete annotations[currentIdx];
   saveAnnotationsLocal();
   refreshSegmentList();
