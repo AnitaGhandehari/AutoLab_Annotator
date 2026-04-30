@@ -1576,6 +1576,7 @@ function updateProgress() {
 /* ================================================================
    PLAYBACK
    ================================================================ */
+vid.addEventListener('timeupdate', () => {
   const seg = segments[currentIdx];
   if (seg && vid.currentTime >= seg.end) {
     vid.pause();
