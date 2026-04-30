@@ -291,6 +291,25 @@
       font-size: 1rem;
       margin-bottom: 4px;
     }
+    .card-heading {
+      margin-bottom: 4px;
+    }
+    .card-title-line1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .card-title-line2 {
+      font-size: .92rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+    .card-title-line2:empty {
+      display: none;
+    }
     .annotation-card .time-range {
       font-size: .82rem;
       color: var(--text-muted);
@@ -880,7 +899,10 @@
   <!-- Right: annotation sidebar -->
   <div class="sidebar">
     <div class="annotation-card">
-      <h2 id="cardTitle">Segment 1</h2>
+      <div class="card-heading">
+        <div id="cardTitleLine1" class="card-title-line1">Segment 1:</div>
+        <div id="cardTitleLine2" class="card-title-line2"></div>
+      </div>
       <div class="time-range" id="cardRange">0:00 – 0:30</div>
       <textarea id="explanation" placeholder="Describe what is happening in this segment of the video..."></textarea>
       <div class="card-actions">
@@ -1325,7 +1347,7 @@ function buildSegmentList() {
     const item = document.createElement('div');
     item.className = 'seg-item';
     item.dataset.idx = seg.idx;
-    const title = seg.label ? seg.label : `Segment ${seg.idx + 1}`;
+    const title = `Section ${seg.idx + 1}`;
     item.innerHTML = `
       <span class="dot"></span>
       <span>${title}</span>
@@ -1371,11 +1393,12 @@ function goToSegment(idx) {
   vid.currentTime = seg.start;
 
   document.getElementById('segLabel').textContent =
-    seg.label
-      ? `${seg.label} (${currentIdx + 1} / ${totalSegs})`
-      : `Segment ${currentIdx + 1} / ${totalSegs}`;
-  document.getElementById('cardTitle').textContent =
-    seg.label || `Segment ${currentIdx + 1}`;
+    `Section ${currentIdx + 1} / ${totalSegs}`;
+
+  document.getElementById('cardTitleLine1').textContent =
+    `Segment ${currentIdx + 1}:`;
+  const line2 = document.getElementById('cardTitleLine2');
+  line2.textContent = seg.label ? seg.label : '';
   document.getElementById('cardRange').textContent =
     `${fmt(seg.start)} – ${fmt(seg.end)}`;
   document.getElementById('explanation').value = annotations[currentIdx] || '';
