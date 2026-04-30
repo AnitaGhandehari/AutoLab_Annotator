@@ -351,25 +351,95 @@
       color: var(--text-muted);
       margin-bottom: 12px;
     }
-    .annotation-card textarea {
-      width: 100%;
-      min-height: 140px;
-      padding: 10px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: .9rem;
-      resize: vertical;
-      transition: border-color .15s;
-    }
-    .annotation-card textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
     .annotation-card .card-actions {
       margin-top: 10px;
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .annotation-fields-scroll {
+      max-height: min(62vh, 720px);
+      overflow-y: auto;
+      padding-right: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .ann-field label.ann-label {
+      display: block;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .ann-help {
+      font-size: .78rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin: 0 0 6px 0;
+    }
+    .ann-field .ann-input,
+    .ann-field textarea.ann-input {
+      width: 100%;
+      min-height: 56px;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .88rem;
+      resize: vertical;
+      transition: border-color .15s;
+    }
+    .ann-field textarea.ann-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .ann-field-steps .step-row {
+      margin-bottom: 10px;
+    }
+    .ann-field-steps .step-row .step-label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .step-row-actions {
+      margin-top: 4px;
+    }
+    .btn-remove-step {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: .75rem;
+      cursor: pointer;
+    }
+    .btn-remove-step:hover {
+      background: #fef2f2;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+    .btn-add-step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 4px;
+      padding: 8px 14px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-add-step:hover {
+      background: var(--primary-hover);
     }
 
     /* ---- Segment list ---- */
@@ -947,7 +1017,36 @@
         <div id="cardTitleLine2" class="card-title-line2"></div>
       </div>
       <div class="time-range" id="cardRange">0:00 – 0:30</div>
-      <textarea id="explanation" placeholder="Describe what is happening in this segment of the video..."></textarea>
+
+      <div class="annotation-fields-scroll" id="annotationFields">
+        <div class="ann-field">
+          <label class="ann-label" for="annEquipment">1) Equipment</label>
+          <p class="ann-help">Instruments and apparatus (pipettes, centrifuge, balance). If nothing applies or you cannot see any, write <code>N/A</code> or <code>[Not visible]</code>.</p>
+          <textarea id="annEquipment" class="ann-input" rows="3" placeholder="e.g. P200 micropipette, microcentrifuge…"></textarea>
+        </div>
+        <div class="ann-field">
+          <label class="ann-label" for="annMaterials">2) Materials</label>
+          <p class="ann-help">Consumables, reagents, tubes, samples. If not on screen or not applicable, write <code>N/A</code> or <code>[Not visible]</code>.</p>
+          <textarea id="annMaterials" class="ann-input" rows="3" placeholder="e.g. 1.5 mL tube, buffer, DNA sample…"></textarea>
+        </div>
+        <div class="ann-field">
+          <label class="ann-label" for="annActions">3) Actions</label>
+          <p class="ann-help">What the person does, with clear verbs (pipettes, vortexes, caps). If unclear, say <code>[Unclear]</code> and what you can see.</p>
+          <textarea id="annActions" class="ann-input" rows="3" placeholder="e.g. She aspirates 20 µL and dispenses into a second tube…"></textarea>
+        </div>
+        <div class="ann-field ann-field-steps">
+          <span class="ann-label">4) Steps</span>
+          <p class="ann-help">Split this segment into ordered steps. Use one box per step. Press <strong>+</strong> to add Step 2, Step 3, and so on.</p>
+          <div id="stepsContainer"></div>
+          <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
+        </div>
+        <div class="ann-field">
+          <label class="ann-label" for="annVisualizedResults">5) Visualized results</label>
+          <p class="ann-help">What you can see changing (color, precipitate, bands, phase). If nothing is shown or it is off frame, write <code>N/A</code> or <code>[Not visible]</code>.</p>
+          <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
+        </div>
+      </div>
+
       <div class="card-actions">
         <button class="btn-accent" id="btnSave">Save</button>
         <button class="btn-outline" id="btnClear">Clear</button>
@@ -1008,11 +1107,12 @@ const timelineThumb   = document.getElementById('timelineThumb');
 const timelineTicks   = document.getElementById('timelineTicks');
 const timelineActiveShade = document.getElementById('timelineActiveShade');
 const videoSelect = document.getElementById('videoSelect');
+const stepsContainer = document.getElementById('stepsContainer');
 
 let timelineDrag = false;
 
 let segments     = [];
-let annotations  = {};  // { segmentIdx: "text" }  for current video
+let annotations  = {};  // { segmentIdx: structured object } for current video
 let currentIdx   = 0;
 let totalSegs    = 0;
 let currentVideoId = '';
@@ -1034,6 +1134,62 @@ function saveAnnotationsLocal() {
   localStorage.setItem(storageKey(), JSON.stringify(annotations));
 }
 
+function emptyStructuredAnnotation() {
+  return {
+    equipment: '',
+    materials: '',
+    actions: '',
+    steps: [''],
+    visualized_results: '',
+  };
+}
+
+function isAnnotationEmpty(obj) {
+  if (obj == null) return true;
+  if (typeof obj === 'string') return !String(obj).trim();
+  if (typeof obj !== 'object') return true;
+  for (const f of ['equipment', 'materials', 'actions', 'visualized_results']) {
+    if (obj[f] && String(obj[f]).trim()) return false;
+  }
+  const steps = obj.steps;
+  if (Array.isArray(steps)) {
+    for (const s of steps) {
+      if (String(s || '').trim()) return false;
+    }
+  }
+  return true;
+}
+
+function normalizeSegmentAnnotation(val) {
+  if (val == null) return emptyStructuredAnnotation();
+  if (typeof val === 'string') {
+    const t = val.trim();
+    if (!t) return emptyStructuredAnnotation();
+    return {
+      equipment: '',
+      materials: '',
+      actions: t,
+      steps: [''],
+      visualized_results: '',
+    };
+  }
+  if (typeof val === 'object') {
+    const stepsRaw = val.steps;
+    let steps = [''];
+    if (Array.isArray(stepsRaw) && stepsRaw.length) {
+      steps = stepsRaw.map((s) => String(s == null ? '' : s));
+    }
+    return {
+      equipment: String(val.equipment ?? '').trim(),
+      materials: String(val.materials ?? '').trim(),
+      actions: String(val.actions ?? '').trim(),
+      steps,
+      visualized_results: String(val.visualized_results ?? val.visualizedResults ?? '').trim(),
+    };
+  }
+  return emptyStructuredAnnotation();
+}
+
 function loadAnnotationsLocal() {
   try {
     const raw = localStorage.getItem(storageKey());
@@ -1041,9 +1197,121 @@ function loadAnnotationsLocal() {
     const data = JSON.parse(raw);
     annotations = {};
     for (const [k, v] of Object.entries(data)) {
-      annotations[parseInt(k)] = v;
+      const idx = parseInt(k, 10);
+      if (Number.isNaN(idx)) continue;
+      const norm = normalizeSegmentAnnotation(v);
+      if (!isAnnotationEmpty(norm)) annotations[idx] = norm;
     }
   } catch { annotations = {}; }
+}
+
+function createStepRow(value) {
+  const wrap = document.createElement('div');
+  wrap.className = 'step-row';
+  const label = document.createElement('label');
+  label.className = 'step-label';
+  const ta = document.createElement('textarea');
+  ta.className = 'ann-input step-input';
+  ta.rows = 2;
+  ta.value = value;
+  const act = document.createElement('div');
+  act.className = 'step-row-actions';
+  const rm = document.createElement('button');
+  rm.type = 'button';
+  rm.className = 'btn-remove-step';
+  rm.textContent = 'Remove';
+  rm.addEventListener('click', () => {
+    if (stepsContainer.querySelectorAll('.step-row').length <= 1) return;
+    wrap.remove();
+    renumberSteps();
+  });
+  act.appendChild(rm);
+  wrap.appendChild(label);
+  wrap.appendChild(ta);
+  wrap.appendChild(act);
+  return wrap;
+}
+
+function renumberSteps() {
+  const rows = [...stepsContainer.querySelectorAll('.step-row')];
+  rows.forEach((row, i) => {
+    const lbl = row.querySelector('.step-label');
+    if (lbl) lbl.textContent = `Step ${i + 1}`;
+    const rm = row.querySelector('.btn-remove-step');
+    if (rm) rm.style.display = rows.length > 1 ? '' : 'none';
+  });
+}
+
+function renderStepsFromData(stepStrings) {
+  stepsContainer.innerHTML = '';
+  const arr = (Array.isArray(stepStrings) && stepStrings.length)
+    ? stepStrings.map((s) => String(s ?? ''))
+    : [''];
+  arr.forEach((text) => {
+    stepsContainer.appendChild(createStepRow(text));
+  });
+  renumberSteps();
+}
+
+function readStepsFromForm() {
+  return [...stepsContainer.querySelectorAll('.step-input')].map((ta) => ta.value.trim());
+}
+
+function writeAnnotationToForm(ann) {
+  const a = normalizeSegmentAnnotation(ann);
+  document.getElementById('annEquipment').value = a.equipment;
+  document.getElementById('annMaterials').value = a.materials;
+  document.getElementById('annActions').value = a.actions;
+  document.getElementById('annVisualizedResults').value = a.visualized_results;
+  renderStepsFromData(a.steps);
+}
+
+function readStructuredAnnotationFromForm() {
+  const steps = readStepsFromForm();
+  return {
+    equipment: document.getElementById('annEquipment').value.trim(),
+    materials: document.getElementById('annMaterials').value.trim(),
+    actions: document.getElementById('annActions').value.trim(),
+    steps: steps.length ? steps : [''],
+    visualized_results: document.getElementById('annVisualizedResults').value.trim(),
+  };
+}
+
+function buildSegmentExportSlice(segIdx) {
+  const ann = normalizeSegmentAnnotation(annotations[segIdx]);
+  const seg = segments[segIdx];
+  const base = {
+    segment: segIdx + 1,
+    step_label: seg && seg.label ? seg.label : null,
+    start: seg ? fmt(seg.start) : '',
+    end: seg ? fmt(seg.end) : '',
+  };
+  if (isAnnotationEmpty(ann)) {
+    return {
+      ...base,
+      equipment: null,
+      materials: null,
+      actions: null,
+      steps: [],
+      visualized_results: null,
+    };
+  }
+  const stepList = Array.isArray(ann.steps)
+    ? ann.steps.map((s) => String(s).trim()).filter(Boolean)
+    : [];
+  return {
+    ...base,
+    equipment: ann.equipment.trim() || null,
+    materials: ann.materials.trim() || null,
+    actions: ann.actions.trim() || null,
+    steps: stepList,
+    visualized_results: ann.visualized_results.trim() || null,
+  };
+}
+
+function segmentExportHasContent(s) {
+  return s.equipment != null || s.materials != null || s.actions != null
+    || (Array.isArray(s.steps) && s.steps.length > 0) || s.visualized_results != null;
 }
 
 /* ---- Helpers ---- */
@@ -1492,7 +1760,7 @@ function selectSegment(idx, opts = {}) {
   line2.textContent = seg.label ? seg.label : '';
   document.getElementById('cardRange').textContent =
     `${fmt(seg.start)} – ${fmt(seg.end)}`;
-  document.getElementById('explanation').value = annotations[currentIdx] || '';
+  writeAnnotationToForm(annotations[currentIdx]);
 
   updateTimelineDisplay();
   updateTimelineActiveShade();
@@ -1558,7 +1826,7 @@ function refreshSegmentList() {
     const idx = parseInt(el.dataset.idx);
     el.classList.toggle('active', idx === currentIdx);
     const dot = el.querySelector('.dot');
-    dot.className = `dot ${annotations[idx] ? 'filled-dot' : 'empty-dot'}`;
+    dot.className = `dot ${annotations[idx] && !isAnnotationEmpty(annotations[idx]) ? 'filled-dot' : 'empty-dot'}`;
   });
 }
 
@@ -1566,7 +1834,7 @@ function refreshSegmentList() {
    PROGRESS
    ================================================================ */
 function updateProgress() {
-  const done  = Object.keys(annotations).length;
+  const done = segments.filter((seg) => !isAnnotationEmpty(annotations[seg.idx])).length;
   const total = segments.length;
   const pct   = total ? Math.round((done / total) * 100) : 0;
   document.getElementById('progressFill').style.width = `${pct}%`;
@@ -1614,11 +1882,11 @@ document.getElementById('btnReplay').addEventListener('click', () => {
    SAVE / CLEAR / EXPORT
    ================================================================ */
 function autoSaveCurrent() {
-  const text = document.getElementById('explanation').value.trim();
-  if (text) {
-    annotations[currentIdx] = text;
-  } else {
+  const obj = readStructuredAnnotationFromForm();
+  if (isAnnotationEmpty(obj)) {
     delete annotations[currentIdx];
+  } else {
+    annotations[currentIdx] = obj;
   }
 }
 
@@ -1630,8 +1898,17 @@ document.getElementById('btnSave').addEventListener('click', () => {
   flash('Saved!');
 });
 
+document.getElementById('btnAddStep').addEventListener('click', () => {
+  stepsContainer.appendChild(createStepRow(''));
+  renumberSteps();
+});
+
 document.getElementById('btnClear').addEventListener('click', () => {
-  document.getElementById('explanation').value = '';
+  document.getElementById('annEquipment').value = '';
+  document.getElementById('annMaterials').value = '';
+  document.getElementById('annActions').value = '';
+  document.getElementById('annVisualizedResults').value = '';
+  renderStepsFromData(['']);
   delete annotations[currentIdx];
   saveAnnotationsLocal();
   refreshSegmentList();
@@ -1649,13 +1926,7 @@ document.getElementById('btnExport').addEventListener('click', () => {
     segment_source: segmentSource,
     segment_duration_sec: segmentSource === 'spreadsheet' ? null : SEGMENT_DURATION,
     annotated_at: new Date().toISOString(),
-    segments: segments.map(seg => ({
-      segment: seg.idx + 1,
-      step_label: seg.label || null,
-      start: fmt(seg.start),
-      end: fmt(seg.end),
-      explanation: annotations[seg.idx] || null,
-    })),
+    segments: segments.map((seg) => buildSegmentExportSlice(seg.idx)),
   };
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -1679,13 +1950,7 @@ function buildExportData() {
     segment_source: segmentSource,
     segment_duration_sec: segmentSource === 'spreadsheet' ? null : SEGMENT_DURATION,
     annotated_at: new Date().toISOString(),
-    segments: segments.map(seg => ({
-      segment: seg.idx + 1,
-      step_label: seg.label || null,
-      start: fmt(seg.start),
-      end: fmt(seg.end),
-      explanation: annotations[seg.idx] || null,
-    })),
+    segments: segments.map((seg) => buildSegmentExportSlice(seg.idx)),
   };
 }
 
@@ -1728,7 +1993,7 @@ async function sendEmailNotification(exportData) {
   const fileName = `${currentVideoId}_${annotatorSlug()}.json`;
   const githubFileUrl = `https://github.com/${GITHUB_REPO}/blob/main/submissions/${fileName}`;
   const rawFileUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/submissions/${fileName}`;
-  const annotatedCount = exportData.segments.filter(s => s.explanation !== null).length;
+  const annotatedCount = exportData.segments.filter((s) => segmentExportHasContent(s)).length;
   const totalCount = exportData.segments.length;
 
   const emailBody = [
@@ -1764,7 +2029,7 @@ document.getElementById('btnDone').addEventListener('click', async () => {
   const btn = document.getElementById('btnDone');
   const exportData = buildExportData();
 
-  const annotated = Object.keys(annotations).length;
+  const annotated = segments.filter((seg) => !isAnnotationEmpty(annotations[seg.idx])).length;
   if (annotated === 0) {
     flash('No segments annotated yet!');
     return;
