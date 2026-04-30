@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Environment variables / secrets
+.env
+
+# Nested git metadata (keep video_annotator_web as plain files in this repo)
+video_annotator_web/.git/
+video_annotator_web/.git_nested_video_annotator_web/

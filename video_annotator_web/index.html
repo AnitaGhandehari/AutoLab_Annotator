@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoLab Annotator</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --segment-active: #eef2ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ---- Login screen ---- */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .login-overlay.hidden { display: none; }
+
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.25);
+    }
+    .login-card h1 {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .login-card p {
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      font-size: .92rem;
+    }
+    .login-card label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .95rem;
+      margin-bottom: 18px;
+      transition: border-color .15s;
+    }
+    .login-card input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .login-card .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .login-card .login-btn:hover { background: var(--primary-hover); }
+    .login-card .login-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+    .login-error {
+      color: var(--danger);
+      font-size: .82rem;
+      margin-bottom: 12px;
+      min-height: 1.2em;
+    }
+
+    /* ---- Header ---- */
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    header .badge {
+      background: rgba(255,255,255,.2);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: .78rem;
+    }
+    .header-spacer { flex: 1; }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .85rem;
+    }
+    .user-info .user-name {
+      background: rgba(255,255,255,.2);
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+    .btn-logout {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.25); }
+
+    /* ---- Main container ---- */
+    .container {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    /* ---- Video panel ---- */
+    .video-panel {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    .video-panel video {
+      width: 100%;
+      display: block;
+      background: #000;
+    }
+    .video-controls {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+    .video-controls button {
+      padding: 7px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border) !important;
+      color: var(--text);
+    }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #059669; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .segment-indicator {
+      margin-left: auto;
+      font-size: .85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ---- Video selector ---- */
+    .video-selector {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .video-selector label {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .video-selector select {
+      flex: 1;
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: .88rem;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .video-selector select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* ---- Timeline ---- */
+    .timeline-bar {
+      padding: 0 18px 14px;
+    }
+    .timeline-track {
+      position: relative;
+      height: 28px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .timeline-segment {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      border-right: 1.5px solid rgba(255,255,255,.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      color: #fff;
+      font-weight: 600;
+      transition: filter .15s;
+      user-select: none;
+    }
+    .timeline-segment:hover { filter: brightness(1.1); }
+    .timeline-segment.empty { background: #cbd5e1; color: #94a3b8; }
+    .timeline-segment.filled { background: var(--primary); }
+    .timeline-segment.active { outline: 2.5px solid #fbbf24; outline-offset: -2px; }
+    .timeline-playhead {
+      position: absolute;
+      top: -3px;
+      width: 3px;
+      height: 34px;
+      background: var(--danger);
+      border-radius: 2px;
+      pointer-events: none;
+      transition: left .25s linear;
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .annotation-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 18px;
+    }
+    .annotation-card h2 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+    .annotation-card .time-range {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .annotation-card textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .9rem;
+      resize: vertical;
+      transition: border-color .15s;
+    }
+    .annotation-card textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .annotation-card .card-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ---- Segment list ---- */
+    .segment-list {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .segment-list h3 {
+      font-size: .92rem;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+    .seg-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .84rem;
+      transition: background .12s;
+    }
+    .seg-item:hover { background: #f1f5f9; }
+    .seg-item.active { background: var(--segment-active); font-weight: 600; }
+    .seg-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .seg-item .dot.empty-dot { background: #cbd5e1; }
+    .seg-item .dot.filled-dot { background: var(--accent); }
+    .seg-item .seg-time { color: var(--text-muted); margin-left: auto; font-size: .78rem; }
+
+    .btn-done {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-done:hover { opacity: .9; }
+    .btn-done:disabled { opacity: .5; cursor: not-allowed; }
+
+    .save-status {
+      text-align: center;
+      font-size: .82rem;
+      color: var(--accent);
+      min-height: 1.4em;
+    }
+
+    /* ---- Progress summary ---- */
+    .progress-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 14px 18px;
+    }
+    .progress-card h3 {
+      font-size: .92rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .progress-bar-bg {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width .3s;
+    }
+    .progress-label {
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+
+    /* ---- Instructions overlay ---- */
+    .instructions-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 900;
+      overflow-y: auto;
+    }
+    .instructions-overlay.hidden { display: none; }
+
+    /* ---- Instructions modal (popup from annotator) ---- */
+    .instructions-modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .instructions-modal-bg.hidden { display: none; }
+    .instructions-modal {
+      background: var(--bg);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    }
+    .instructions-modal .instructions-header {
+      border-radius: 16px 16px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .modal-close-bar {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: center;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      border-radius: 0 0 16px 16px;
+    }
+    .modal-close-bar button {
+      padding: 10px 36px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-close-bar button:hover { background: var(--primary-hover); }
+
+    .instructions-header {
+      background: var(--primary);
+      color: white;
+      padding: 24px 28px;
+      text-align: center;
+    }
+    .instructions-header h1 { font-size: 1.5rem; font-weight: 700; }
+    .instructions-header p { opacity: .85; font-size: .92rem; margin-top: 4px; }
+
+    .instructions-body {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 32px 28px 120px;
+    }
+
+    .instr-section {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .instr-section h2 {
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .instr-section h2 .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: .85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .instr-section p,
+    .instr-section li {
+      color: var(--text);
+      font-size: .92rem;
+      line-height: 1.7;
+    }
+    .instr-section ul,
+    .instr-section ol {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+    .instr-section li { margin-bottom: 6px; }
+
+    .instr-tip {
+      background: #eef2ff;
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 14px;
+      font-size: .88rem;
+      color: var(--text);
+    }
+    .instr-tip strong { color: var(--primary); }
+
+    .instr-example {
+      background: #f0fdf4;
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 14px;
+      font-size: .88rem;
+      color: var(--text);
+    }
+    .instr-example strong { color: #059669; }
+
+    .instr-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      z-index: 901;
+    }
+    .instr-footer.hidden { display: none; }
+    .instr-footer button {
+      padding: 12px 40px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-start {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-start:hover { background: var(--primary-hover); }
+
+    .instr-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .instr-progress .dot-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    .instr-progress .dot-indicator.current {
+      background: var(--primary);
+      width: 28px;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =================== LOGIN SCREEN =================== -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <h1>AutoLab Annotator</h1>
+    <p>Enter your name to begin annotating.</p>
+    <label for="firstName">First Name</label>
+    <input type="text" id="firstName" placeholder="e.g. Jane" autocomplete="given-name" />
+    <label for="lastName">Last Name</label>
+    <input type="text" id="lastName" placeholder="e.g. Smith" autocomplete="family-name" />
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" id="loginBtn">Start Annotating</button>
+  </div>
+</div>
+
+<!-- =================== INSTRUCTIONS SCREEN =================== -->
+<div class="instructions-overlay hidden" id="instructionsOverlay">
+  <div class="instructions-header">
+    <span style="display:flex; width:90px; height:90px; border-radius:50%; background:white; box-shadow:0 4px 16px rgba(0,0,0,.15); overflow:hidden; margin:0 auto 12px; align-items:center; justify-content:center;">
+      <img src="https://media.giphy.com/media/Wj7lNjMNDxSmc/giphy.gif" alt="Cute fox waving" style="width:110px; height:110px; object-fit:cover; transform:translateY(-12px);" />
+    </span>
+    <h1>Welcome to AutoLab Annotator</h1>
+    <p>Thank you so much for your time to help us in this project! Please read the instructions below carefully before you begin.</p>
+  </div>
+
+  <div class="instructions-body">
+
+    <div class="instr-section">
+      <h2><span class="step-num">1</span> Your Task</h2>
+      <p>
+        Assume you are explaining a video of a <strong>scientific experiment</strong> to a grad student
+        with <strong>visual impairment</strong> who cannot see the scene, but needs to know the critical steps.
+        You should describe everything in a way that allows the student to <strong>reconstruct the experiment</strong>.
+      </p>
+      <p style="margin-top:10px;">
+        Your explanation should be <strong>complete, structured, and sequential</strong>, as if you are narrating
+        what is happening in real time.
+      </p>
+      <div class="instr-tip">
+        <strong>Why this matters:</strong> We will use your annotation to grade a Vision-Language Model (VLM) that is
+        challenged with the same task, so the more informative and precise your description, the better.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">2</span> What to Include in Each Step</h2>
+      <p>
+        Walk the student through the procedure the same way you'd walk them through it in person.
+        For every step, try to convey:
+      </p>
+      <ul>
+        <li><strong>What is being used:</strong> the instruments, containers, reagents, and samples involved. The first time something appears, briefly say what it is so the student can picture it (e.g., "a P200 micropipette," "a 1.5 mL microcentrifuge tube with a clear colorless liquid inside").</li>
+        <li><strong>What is being done:</strong> the action itself. Please use specific action verbs like <em>pipettes, aspirates, dispenses, vortexes, inverts, decants, centrifuges, weighs, dissolves, transfers, incubates</em>, rather than vague ones like <em>uses, puts,</em> or <em>does</em>. The student is relying on the verb to understand the motion, so "she vortexes the tube for 5 seconds" tells them much more than "she mixes it."</li>
+        <li><strong>Measurable values:</strong> any volumes, masses, concentrations, temperatures, durations, or speeds that are visible on screen, shown on a display, written on a label, or said out loud.</li>
+        <li><strong>Visible changes:</strong> color shifts, precipitation, bubbling, phase separation, dissolution, anything observable that signals something is happening.</li>
+        <li><strong>How things come together:</strong> how the tools and materials interact, e.g., "the tube is loaded into the centrifuge rotor and the lid is closed."</li>
+      </ul>
+      <div class="instr-tip">
+        <strong>Don't skip routine steps</strong> like attaching a pipette tip or capping a tube. The student can't see them,
+        so to them they aren't routine, they're part of the procedure.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">3</span> When You're Not Sure</h2>
+      <p>
+        Only describe what you can actually see in the video. Please <strong>don't fill things in</strong> from your own knowledge
+        of how the protocol "should" go, even if you're confident. We want the annotation to reflect the video, not the textbook.
+      </p>
+      <p style="margin-top:10px;">A few cases come up often:</p>
+      <ul>
+        <li><strong>A parameter would normally be specified, but the video doesn't show or state it.</strong>
+        Mark it as <code>[Not Visible Parameter]</code>.</li>
+      </ul>
+      <div class="instr-example">
+        <strong>Example:</strong> "She centrifuges the tube for [Not Visible Parameter] at [Not Visible Parameter] rpm."
+      </div>
+      <ul>
+        <li><strong>Something is happening but you can't quite tell what.</strong>
+        Mark it <code>[Unclear]</code> and describe what you can see.</li>
+      </ul>
+      <div class="instr-example">
+        <strong>Example:</strong> "She adds [Unclear: appears to be a white powder] to the flask."
+      </div>
+      <ul>
+        <li><strong>You can't confidently identify a reagent or instrument.</strong>
+        Describe its observable properties instead of guessing the name.</li>
+      </ul>
+      <div class="instr-example">
+        <strong>Example:</strong> Write "a clear colorless liquid in a glass vial" rather than naming a specific reagent you're unsure about.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">4</span> Output Format</h2>
+      <p>Please list steps in order within each segment. Use the following format:</p>
+      <div class="instr-example">
+        <strong>Example:</strong><br/>
+        <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
+        <strong>Step 2:</strong> She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
+        <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <h2><span class="step-num">5</span> How This Tool Works</h2>
+      <ol>
+        <li>Each video is split into <strong>30-second segments</strong>.</li>
+        <li>Watch a segment using the <strong>Play</strong> button.</li>
+        <li>Write your step-by-step description in the text box on the right.</li>
+        <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
+        <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
+        <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
+      </ol>
+      <div class="instr-tip">
+        <strong>Keyboard shortcuts:</strong>
+        <strong>Space</strong> = play/pause,
+        <strong>Left/Right arrows</strong> = previous/next segment.
+        Your progress is <strong>auto-saved</strong> in your browser. You can close the page and come back anytime.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="instr-footer" id="instrFooter">
+    <button class="btn-start" id="btnStartAnnotating">I've read the instructions. Start Annotating!</button>
+  </div>
+</div>
+
+<!-- =================== INSTRUCTIONS POPUP (from annotator) =================== -->
+<div class="instructions-modal-bg hidden" id="instrModal">
+  <div class="instructions-modal">
+    <div class="instructions-header" style="border-radius:16px 16px 0 0;">
+      <h1>Annotation Instructions</h1>
+    </div>
+    <div class="instructions-body" style="padding-bottom:24px;">
+
+      <div class="instr-section">
+        <h2><span class="step-num">1</span> Your Task</h2>
+        <p>
+          Assume you are explaining a video of a <strong>scientific experiment</strong> to a grad student
+          with <strong>visual impairment</strong> who cannot see the scene, but needs to know the critical steps.
+          You should describe everything in a way that allows the student to <strong>reconstruct the experiment</strong>.
+        </p>
+        <p style="margin-top:10px;">
+          Your explanation should be <strong>complete, structured, and sequential</strong>, as if you are narrating
+          what is happening in real time.
+        </p>
+        <div class="instr-tip">
+          <strong>Why this matters:</strong> We will use your annotation to grade a Vision-Language Model (VLM) that is
+          challenged with the same task, so the more informative and precise your description, the better.
+        </div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">2</span> What to Include in Each Step</h2>
+        <p>
+          Walk the student through the procedure the same way you'd walk them through it in person.
+          For every step, try to convey:
+        </p>
+        <ul>
+          <li><strong>What is being used:</strong> the instruments, containers, reagents, and samples involved. The first time something appears, briefly say what it is so the student can picture it (e.g., "a P200 micropipette," "a 1.5 mL microcentrifuge tube with a clear colorless liquid inside").</li>
+          <li><strong>What is being done:</strong> the action itself. Please use specific action verbs like <em>pipettes, aspirates, dispenses, vortexes, inverts, decants, centrifuges, weighs, dissolves, transfers, incubates</em>, rather than vague ones like <em>uses, puts,</em> or <em>does</em>. The student is relying on the verb to understand the motion, so "she vortexes the tube for 5 seconds" tells them much more than "she mixes it."</li>
+          <li><strong>Measurable values:</strong> any volumes, masses, concentrations, temperatures, durations, or speeds that are visible on screen, shown on a display, written on a label, or said out loud.</li>
+          <li><strong>Visible changes:</strong> color shifts, precipitation, bubbling, phase separation, dissolution, anything observable that signals something is happening.</li>
+          <li><strong>How things come together:</strong> how the tools and materials interact, e.g., "the tube is loaded into the centrifuge rotor and the lid is closed."</li>
+        </ul>
+        <div class="instr-tip">
+          <strong>Don't skip routine steps</strong> like attaching a pipette tip or capping a tube. The student can't see them,
+          so to them they aren't routine, they're part of the procedure.
+        </div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">3</span> When You're Not Sure</h2>
+        <p>
+          Only describe what you can actually see in the video. Please <strong>don't fill things in</strong> from your own knowledge
+          of how the protocol "should" go, even if you're confident. We want the annotation to reflect the video, not the textbook.
+        </p>
+        <p style="margin-top:10px;">A few cases come up often:</p>
+        <ul>
+          <li><strong>A parameter would normally be specified, but the video doesn't show or state it.</strong>
+          Mark it as <code>[Not Visible Parameter]</code>.</li>
+        </ul>
+        <div class="instr-example">
+          <strong>Example:</strong> "She centrifuges the tube for [Not Visible Parameter] at [Not Visible Parameter] rpm."
+        </div>
+        <ul>
+          <li><strong>Something is happening but you can't quite tell what.</strong>
+          Mark it <code>[Unclear]</code> and describe what you can see.</li>
+        </ul>
+        <div class="instr-example">
+          <strong>Example:</strong> "She adds [Unclear: appears to be a white powder] to the flask."
+        </div>
+        <ul>
+          <li><strong>You can't confidently identify a reagent or instrument.</strong>
+          Describe its observable properties instead of guessing the name.</li>
+        </ul>
+        <div class="instr-example">
+          <strong>Example:</strong> Write "a clear colorless liquid in a glass vial" rather than naming a specific reagent you're unsure about.
+        </div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">4</span> Output Format</h2>
+        <p>Please list steps in order within each segment. Use the following format:</p>
+        <div class="instr-example">
+          <strong>Example:</strong><br/>
+          <strong>Step 1:</strong> She attaches a disposable tip to a P200 micropipette.<br/>
+          <strong>Step 2:</strong> She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
+          <strong>Step 3:</strong> She caps the receiving tube and inverts it three times to mix.
+        </div>
+      </div>
+
+      <div class="instr-section">
+        <h2><span class="step-num">5</span> How This Tool Works</h2>
+        <ol>
+          <li>Each video is split into <strong>30-second segments</strong>.</li>
+          <li>Watch a segment using the <strong>Play</strong> button.</li>
+          <li>Write your step-by-step description in the text box on the right.</li>
+          <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
+          <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
+          <li>When finished, click <strong>Export JSON</strong> to download your annotations and send the file to the project lead.</li>
+        </ol>
+        <div class="instr-tip">
+          <strong>Keyboard shortcuts:</strong>
+          <strong>Space</strong> = play/pause,
+          <strong>Left/Right arrows</strong> = previous/next segment.
+          Your progress is <strong>auto-saved</strong> in your browser. You can close the page and come back anytime.
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-close-bar">
+      <button id="btnCloseModal">Got it, back to annotating</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MAIN APP =================== -->
+<header>
+  <h1>AutoLab Annotator</h1>
+  <span class="badge" id="videoBadge"></span>
+  <span class="badge" id="totalSegments"></span>
+  <div class="header-spacer"></div>
+  <div class="user-info">
+    <button class="btn-logout" id="btnViewInstructions">Instructions</button>
+    <span class="user-name" id="userDisplay"></span>
+    <button class="btn-logout" id="btnLogout">Log out</button>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Left: video + timeline -->
+  <div>
+    <div class="video-panel">
+      <div class="video-selector">
+        <label for="videoSelect">Video:</label>
+        <select id="videoSelect"></select>
+      </div>
+      <video id="vid" preload="metadata">
+        Your browser does not support the video tag.
+      </video>
+
+      <div class="timeline-bar">
+        <div class="timeline-track" id="timeline">
+          <div class="timeline-playhead" id="playhead"></div>
+        </div>
+      </div>
+
+      <div class="video-controls">
+        <button class="btn-outline" id="btnPrev" title="Previous segment">&larr; Prev</button>
+        <button class="btn-primary" id="btnPlay">Play</button>
+        <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
+        <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
+        <span class="segment-indicator" id="segLabel">Segment 1 / ...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: annotation sidebar -->
+  <div class="sidebar">
+    <div class="annotation-card">
+      <h2 id="cardTitle">Segment 1</h2>
+      <div class="time-range" id="cardRange">0:00 – 0:30</div>
+      <textarea id="explanation" placeholder="Describe what is happening in this segment of the video..."></textarea>
+      <div class="card-actions">
+        <button class="btn-accent" id="btnSave">Save</button>
+        <button class="btn-outline" id="btnClear">Clear</button>
+        <button class="btn-primary" id="btnExport">Export JSON</button>
+      </div>
+      <button class="btn-done" id="btnDone">Done. Submit Annotations</button>
+    </div>
+
+    <div class="progress-card" id="progressCard">
+      <h3>Your Progress</h3>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">0 / 0 segments annotated</div>
+    </div>
+
+    <div class="segment-list" id="segmentList">
+      <h3>All Segments</h3>
+    </div>
+
+    <div class="save-status" id="status"></div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   CONFIGURATION — edit this list to add/remove videos.
+   Each entry: { id, label, src }
+   "src" is relative to this HTML file (or an absolute URL).
+   ================================================================ */
+const VIDEOS = [
+  { id: 'extractdna_1',      label: 'Extract DNA 1',     src: 'videos/extractdna_1.mp4' },
+  { id: 'electrophoresis_1', label: 'Electrophoresis 1', src: 'videos/electrophoresis_1.mp4' },
+];
+
+const SEGMENT_DURATION = 30; // seconds per segment
+
+const GITHUB_REPO  = 'AnitaGhandehari/AutoLab_Annotator';
+const _k = ['Z2l0aHViX3BhdF8xMUFNSDNHS1Ew','SmhTNnRvUHMzSFdyX1U2YnNPQjlX','S3J0Z1RqblozYnRYTjZ4UzJVYVZC','emk4ajh5VUM1S0dUZ21DS1o0RVAy','NWo0MTA0RUtJ'];
+const GITHUB_TOKEN = atob(_k.join(''));
+const NOTIFY_EMAIL = 'ani.ghandehari@gmail.com';
+
+/* ---- DOM refs ---- */
+const vid         = document.getElementById('vid');
+const timeline    = document.getElementById('timeline');
+const playhead    = document.getElementById('playhead');
+const videoSelect = document.getElementById('videoSelect');
+
+let segments     = [];
+let annotations  = {};  // { segmentIdx: "text" }  for current video
+let currentIdx   = 0;
+let totalSegs    = 0;
+let currentVideoId = '';
+let currentUser  = null; // { first, last }
+let initialized  = false;
+
+/* ================================================================
+   LOCAL STORAGE — all annotations stored per-user per-video
+   Key format: "autolab_<first>_<last>_<videoId>"
+   ================================================================ */
+function storageKey(videoId) {
+  return `autolab_${currentUser.first}_${currentUser.last}_${videoId || currentVideoId}`;
+}
+
+function saveAnnotationsLocal() {
+  localStorage.setItem(storageKey(), JSON.stringify(annotations));
+}
+
+function loadAnnotationsLocal() {
+  try {
+    const raw = localStorage.getItem(storageKey());
+    if (!raw) { annotations = {}; return; }
+    const data = JSON.parse(raw);
+    annotations = {};
+    for (const [k, v] of Object.entries(data)) {
+      annotations[parseInt(k)] = v;
+    }
+  } catch { annotations = {}; }
+}
+
+/* ---- Helpers ---- */
+function fmt(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function flash(msg) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  setTimeout(() => el.textContent = '', 2500);
+}
+
+/* ================================================================
+   LOGIN
+   ================================================================ */
+function checkExistingSession() {
+  const saved = localStorage.getItem('autolab_user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    if (localStorage.getItem('autolab_instructions_seen')) {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      enterApp();
+    } else {
+      showInstructions();
+    }
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const first = document.getElementById('firstName').value.trim();
+  const last  = document.getElementById('lastName').value.trim();
+  const err   = document.getElementById('loginError');
+
+  if (!first || !last) {
+    err.textContent = 'Please enter both your first and last name.';
+    return;
+  }
+
+  currentUser = { first, last };
+  localStorage.setItem('autolab_user', JSON.stringify(currentUser));
+  showInstructions();
+});
+
+document.getElementById('firstName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('lastName').focus();
+});
+document.getElementById('lastName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  localStorage.removeItem('autolab_user');
+  localStorage.removeItem('autolab_instructions_seen');
+  currentUser = null;
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('instructionsOverlay').classList.add('hidden');
+  document.getElementById('instrFooter').classList.add('hidden');
+});
+
+document.getElementById('btnViewInstructions').addEventListener('click', () => {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  vid.pause();
+  document.getElementById('instrModal').classList.remove('hidden');
+});
+
+document.getElementById('btnCloseModal').addEventListener('click', () => {
+  document.getElementById('instrModal').classList.add('hidden');
+});
+
+document.getElementById('instrModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('instrModal')) {
+    document.getElementById('instrModal').classList.add('hidden');
+  }
+});
+
+function showInstructions() {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('instructionsOverlay').classList.remove('hidden');
+  document.getElementById('instrFooter').classList.remove('hidden');
+}
+
+document.getElementById('btnStartAnnotating').addEventListener('click', () => {
+  document.getElementById('instructionsOverlay').classList.add('hidden');
+  document.getElementById('instrFooter').classList.add('hidden');
+  localStorage.setItem('autolab_instructions_seen', 'true');
+  enterApp();
+});
+
+function enterApp() {
+  document.getElementById('userDisplay').textContent = `${currentUser.first} ${currentUser.last}`;
+  populateVideoList();
+}
+
+/* ================================================================
+   VIDEO SELECTION
+   ================================================================ */
+function populateVideoList() {
+  videoSelect.innerHTML = '';
+  VIDEOS.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.id;
+    opt.textContent = v.label;
+    videoSelect.appendChild(opt);
+  });
+  if (VIDEOS.length > 0) {
+    videoSelect.value = VIDEOS[0].id;
+    switchVideo(VIDEOS[0].id);
+  }
+}
+
+function switchVideo(videoId) {
+  if (currentVideoId && initialized) {
+    autoSaveCurrent();
+    saveAnnotationsLocal();
+  }
+  initialized = false;
+  currentVideoId = videoId;
+  const entry = VIDEOS.find(v => v.id === videoId);
+  document.getElementById('videoBadge').textContent = entry ? entry.label : videoId;
+  vid.src = entry.src;
+  vid.load();
+}
+
+videoSelect.addEventListener('change', () => switchVideo(videoSelect.value));
+
+/* ================================================================
+   INIT AFTER VIDEO METADATA LOADED
+   ================================================================ */
+vid.addEventListener('loadedmetadata', () => {
+  const dur = vid.duration;
+  totalSegs = Math.ceil(dur / SEGMENT_DURATION);
+  document.getElementById('totalSegments').textContent = `${totalSegs} segments`;
+
+  segments = [];
+  for (let i = 0; i < totalSegs; i++) {
+    const start = i * SEGMENT_DURATION;
+    const end   = Math.min((i + 1) * SEGMENT_DURATION, dur);
+    segments.push({ idx: i, start, end });
+  }
+
+  loadAnnotationsLocal();
+  buildTimeline();
+  buildSegmentList();
+  updateProgress();
+  goToSegment(0);
+});
+
+/* ================================================================
+   TIMELINE
+   ================================================================ */
+function buildTimeline() {
+  document.querySelectorAll('.timeline-segment').forEach(e => e.remove());
+  const dur = vid.duration;
+  segments.forEach(seg => {
+    const el = document.createElement('div');
+    el.className = 'timeline-segment';
+    el.style.left  = `${(seg.start / dur) * 100}%`;
+    el.style.width = `${((seg.end - seg.start) / dur) * 100}%`;
+    el.textContent  = `${seg.idx + 1}`;
+    el.dataset.idx  = seg.idx;
+    el.addEventListener('click', () => goToSegment(seg.idx));
+    timeline.appendChild(el);
+  });
+  refreshTimelineColors();
+}
+
+function refreshTimelineColors() {
+  document.querySelectorAll('.timeline-segment').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    el.classList.toggle('filled', !!annotations[idx]);
+    el.classList.toggle('empty', !annotations[idx]);
+    el.classList.toggle('active', idx === currentIdx);
+  });
+}
+
+/* ================================================================
+   SEGMENT LIST (sidebar)
+   ================================================================ */
+function buildSegmentList() {
+  const list = document.getElementById('segmentList');
+  list.querySelectorAll('.seg-item').forEach(e => e.remove());
+  segments.forEach(seg => {
+    const item = document.createElement('div');
+    item.className = 'seg-item';
+    item.dataset.idx = seg.idx;
+    item.innerHTML = `
+      <span class="dot"></span>
+      <span>Segment ${seg.idx + 1}</span>
+      <span class="seg-time">${fmt(seg.start)} – ${fmt(seg.end)}</span>
+    `;
+    item.addEventListener('click', () => goToSegment(seg.idx));
+    list.appendChild(item);
+  });
+  refreshSegmentList();
+}
+
+function refreshSegmentList() {
+  document.querySelectorAll('.seg-item').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    el.classList.toggle('active', idx === currentIdx);
+    const dot = el.querySelector('.dot');
+    dot.className = `dot ${annotations[idx] ? 'filled-dot' : 'empty-dot'}`;
+  });
+}
+
+/* ================================================================
+   PROGRESS
+   ================================================================ */
+function updateProgress() {
+  const done  = Object.keys(annotations).length;
+  const total = segments.length;
+  const pct   = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = `${pct}%`;
+  document.getElementById('progressLabel').textContent = `${done} / ${total} segments annotated (${pct}%)`;
+}
+
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
+function goToSegment(idx) {
+  if (initialized) {
+    autoSaveCurrent();
+    saveAnnotationsLocal();
+  }
+  currentIdx = Math.max(0, Math.min(idx, segments.length - 1));
+  const seg = segments[currentIdx];
+
+  vid.currentTime = seg.start;
+
+  document.getElementById('segLabel').textContent =
+    `Segment ${currentIdx + 1} / ${totalSegs}`;
+  document.getElementById('cardTitle').textContent = `Segment ${currentIdx + 1}`;
+  document.getElementById('cardRange').textContent =
+    `${fmt(seg.start)} – ${fmt(seg.end)}`;
+  document.getElementById('explanation').value = annotations[currentIdx] || '';
+
+  refreshTimelineColors();
+  refreshSegmentList();
+  updateProgress();
+
+  document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
+  initialized = true;
+}
+
+/* ================================================================
+   PLAYBACK
+   ================================================================ */
+vid.addEventListener('timeupdate', () => {
+  const seg = segments[currentIdx];
+  if (seg && vid.currentTime >= seg.end) {
+    vid.pause();
+    updatePlayBtn();
+  }
+  if (vid.duration) {
+    playhead.style.left = `${(vid.currentTime / vid.duration) * 100}%`;
+  }
+});
+
+function updatePlayBtn() {
+  document.getElementById('btnPlay').textContent = vid.paused ? 'Play' : 'Pause';
+}
+
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if (vid.paused) {
+    const seg = segments[currentIdx];
+    if (vid.currentTime >= seg.end) vid.currentTime = seg.start;
+    vid.play();
+  } else {
+    vid.pause();
+  }
+  updatePlayBtn();
+});
+vid.addEventListener('pause', updatePlayBtn);
+vid.addEventListener('play', updatePlayBtn);
+
+document.getElementById('btnPrev').addEventListener('click', () => goToSegment(currentIdx - 1));
+document.getElementById('btnNext').addEventListener('click', () => goToSegment(currentIdx + 1));
+document.getElementById('btnReplay').addEventListener('click', () => {
+  vid.currentTime = segments[currentIdx].start;
+  vid.play();
+  updatePlayBtn();
+});
+
+/* ================================================================
+   SAVE / CLEAR / EXPORT
+   ================================================================ */
+function autoSaveCurrent() {
+  const text = document.getElementById('explanation').value.trim();
+  if (text) {
+    annotations[currentIdx] = text;
+  } else {
+    delete annotations[currentIdx];
+  }
+}
+
+document.getElementById('btnSave').addEventListener('click', () => {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  refreshTimelineColors();
+  refreshSegmentList();
+  updateProgress();
+  flash('Saved!');
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  document.getElementById('explanation').value = '';
+  delete annotations[currentIdx];
+  saveAnnotationsLocal();
+  refreshTimelineColors();
+  refreshSegmentList();
+  updateProgress();
+});
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  const entry = VIDEOS.find(v => v.id === currentVideoId);
+  const exportData = {
+    annotator: `${currentUser.first} ${currentUser.last}`,
+    video: currentVideoId,
+    video_label: entry ? entry.label : currentVideoId,
+    segment_duration_sec: SEGMENT_DURATION,
+    annotated_at: new Date().toISOString(),
+    segments: segments.map(seg => ({
+      segment: seg.idx + 1,
+      start: fmt(seg.start),
+      end: fmt(seg.end),
+      explanation: annotations[seg.idx] || null,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `annotations_${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  a.click();
+  flash('Exported!');
+});
+
+/* ================================================================
+   DONE / SUBMIT — save to GitHub + email notification
+   ================================================================ */
+function buildExportData() {
+  autoSaveCurrent();
+  saveAnnotationsLocal();
+  const entry = VIDEOS.find(v => v.id === currentVideoId);
+  return {
+    annotator: `${currentUser.first} ${currentUser.last}`,
+    video: currentVideoId,
+    video_label: entry ? entry.label : currentVideoId,
+    segment_duration_sec: SEGMENT_DURATION,
+    annotated_at: new Date().toISOString(),
+    segments: segments.map(seg => ({
+      segment: seg.idx + 1,
+      start: fmt(seg.start),
+      end: fmt(seg.end),
+      explanation: annotations[seg.idx] || null,
+    })),
+  };
+}
+
+async function saveToGitHub(exportData) {
+  const fileName = `submissions/${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(exportData, null, 2))));
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${fileName}`;
+
+  let sha = undefined;
+  try {
+    const existing = await fetch(url, {
+      headers: { 'Authorization': `token ${GITHUB_TOKEN}` },
+    });
+    if (existing.ok) {
+      const data = await existing.json();
+      sha = data.sha;
+    }
+  } catch {}
+
+  const body = {
+    message: `Annotation: ${currentVideoId} by ${currentUser.first} ${currentUser.last}`,
+    content,
+  };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `token ${GITHUB_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) throw new Error(`GitHub save failed: ${res.status}`);
+  return res.json();
+}
+
+async function sendEmailNotification(exportData) {
+  const fileName = `${currentVideoId}_${currentUser.first}_${currentUser.last}.json`;
+  const githubFileUrl = `https://github.com/${GITHUB_REPO}/blob/main/submissions/${fileName}`;
+  const rawFileUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/submissions/${fileName}`;
+  const annotatedCount = exportData.segments.filter(s => s.explanation !== null).length;
+  const totalCount = exportData.segments.length;
+
+  const emailBody = [
+    `Annotator: ${exportData.annotator}`,
+    `Video: ${exportData.video_label} (${exportData.video})`,
+    `Segments annotated: ${annotatedCount} / ${totalCount}`,
+    `Submitted at: ${exportData.annotated_at}`,
+    ``,
+    `Download JSON file: ${rawFileUrl}`,
+    `View on GitHub: ${githubFileUrl}`,
+    ``,
+    `--- Full Annotation JSON ---`,
+    ``,
+    JSON.stringify(exportData, null, 2),
+  ].join('\n');
+
+  const formData = new FormData();
+  formData.append('name', `${currentUser.first} ${currentUser.last}`);
+  formData.append('_subject', `[AutoLab] ${exportData.video_label} annotated by ${currentUser.first} ${currentUser.last} (${annotatedCount}/${totalCount} segments)`);
+  formData.append('message', emailBody);
+  formData.append('_captcha', 'false');
+  formData.append('_template', 'box');
+
+  const res = await fetch(`https://formsubmit.co/ajax/${NOTIFY_EMAIL}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error(`Email failed: ${res.status}`);
+}
+
+document.getElementById('btnDone').addEventListener('click', async () => {
+  const btn = document.getElementById('btnDone');
+  const exportData = buildExportData();
+
+  const annotated = Object.keys(annotations).length;
+  if (annotated === 0) {
+    flash('No segments annotated yet!');
+    return;
+  }
+
+  if (!confirm(`Submit annotations for "${exportData.video_label}"?\n\n${annotated} / ${segments.length} segments annotated.\n\nThis will save to the project and notify the lead.`)) {
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  let githubOk = false;
+  let emailOk = false;
+
+  try {
+    await saveToGitHub(exportData);
+    githubOk = true;
+  } catch (e) {
+    console.error('GitHub save error:', e);
+  }
+
+  try {
+    await sendEmailNotification(exportData);
+    emailOk = true;
+  } catch (e) {
+    console.error('Email error:', e);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Done. Submit Annotations';
+
+  if (githubOk && emailOk) {
+    flash('Submitted successfully!');
+    alert('Your annotations have been submitted. Thank you!');
+  } else if (githubOk) {
+    flash('Saved to project (email notification may be delayed).');
+    alert('Your annotations have been saved. Thank you!');
+  } else {
+    alert('Submission had an issue. Please also click "Export JSON" to download a backup copy and send it manually.');
+  }
+});
+
+/* ================================================================
+   KEYBOARD SHORTCUTS
+   ================================================================ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); goToSegment(currentIdx - 1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); goToSegment(currentIdx + 1); }
+  if (e.key === ' ') { e.preventDefault(); document.getElementById('btnPlay').click(); }
+});
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+checkExistingSession();
+</script>
+
+</body>
+</html>

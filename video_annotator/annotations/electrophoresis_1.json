@@ -1,0 +1,19 @@
+{
+  "0": "Gesture recognition using surface electromyography (sEMG)19–24could  benefit  from  a  hybrid  system  with  in-sensor  processing.  sEMG-based  gesture  recognition  devices  can  measure  electrical  muscle  activity  from  electrodes  placed  on  the  surface  of  the  skin  and  perform  pattern  recognition  on  features  that  are  extracted  from  these  signals11,25.  These  devices  should  ideally  have  a  small  standalone  form  factor  for  autonomy,  a  high  channel  count  and  high-density  electrode  placement  for  more  comprehensive  spatial  coverage  and  improved  classification  accuracy26,27,  and  in-sensor  intelligence  that  is  generalizable  or  adaptable  to  various  wear  conditions.  Existing  devices  are  either  in  non-wearable  form  fac-tors26,  dependent  on  external  devices  for  computation28  or  reliant  on  a  small  number  of  precisely  positioned,  bulky  electrodes12,29,30. Furthermore,  the  systems  that  are  capable  of  in-sensor  (online)  training  do  not  support  in-sensor  model  updates29,30.  These  sys-tems thus cannot adapt to signal variations from sweating, fatigue, varying muscle contraction effort, and electrode displacement due to changing situational contexts such as limb and body position or device doffing and donning13–18.In this Article, we report a wearable, high-density sEMG biosens-ing system (Fig. 1a) that uses hyperdimensional (HD) computing to implement in-sensor adaptive learning and real-time inference for hand gesture classification. HD computing is an emerging comput-ing paradigm that supports fast and simple learning and is inherently robust against noise and errors31. HD computing takes advantage of information  being  represented  by  very  high-dimensional  vectors  (hypervectors) to perform otherwise complex tasks, such as classifi-cation or reasoning, using simple computational operations31. This approach has already shown promising results in classification tasks",
+  "1": "seg2",
+  "2": "seg3",
+  "3": "seg4",
+  "4": "seg5",
+  "5": "seg6",
+  "6": "seg7",
+  "7": "seg8",
+  "8": "seg9",
+  "9": "seg10",
+  "10": "seg11",
+  "11": "seg6",
+  "12": "seg13",
+  "13": "seg14",
+  "14": "seg15",
+  "15": "seg16",
+  "16": "seg17"
+}

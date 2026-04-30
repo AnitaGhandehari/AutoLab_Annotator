@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Annotator — BioVL-QR</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --segment-active: #eef2ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    header .badge {
+      background: rgba(255,255,255,.2);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: .78rem;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    /* ---- Video panel ---- */
+    .video-panel {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    .video-panel video {
+      width: 100%;
+      display: block;
+      background: #000;
+    }
+    .video-controls {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+    .video-controls button {
+      padding: 7px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border) !important;
+      color: var(--text);
+    }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #059669; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .segment-indicator {
+      margin-left: auto;
+      font-size: .85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ---- Timeline ---- */
+    .timeline-bar {
+      padding: 0 18px 14px;
+    }
+    .timeline-track {
+      position: relative;
+      height: 28px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .timeline-segment {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      border-right: 1.5px solid rgba(255,255,255,.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      color: #fff;
+      font-weight: 600;
+      transition: filter .15s;
+      user-select: none;
+    }
+    .timeline-segment:hover { filter: brightness(1.1); }
+    .timeline-segment.empty { background: #cbd5e1; color: #94a3b8; }
+    .timeline-segment.filled { background: var(--primary); }
+    .timeline-segment.active { outline: 2.5px solid #fbbf24; outline-offset: -2px; }
+    .timeline-playhead {
+      position: absolute;
+      top: -3px;
+      width: 3px;
+      height: 34px;
+      background: var(--danger);
+      border-radius: 2px;
+      pointer-events: none;
+      transition: left .25s linear;
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .annotation-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 18px;
+    }
+    .annotation-card h2 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+    .annotation-card .time-range {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .annotation-card textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .9rem;
+      resize: vertical;
+      transition: border-color .15s;
+    }
+    .annotation-card textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .annotation-card .card-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ---- Segment list ---- */
+    .segment-list {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .segment-list h3 {
+      font-size: .92rem;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+    .seg-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .84rem;
+      transition: background .12s;
+    }
+    .seg-item:hover { background: #f1f5f9; }
+    .seg-item.active { background: var(--segment-active); font-weight: 600; }
+    .seg-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .seg-item .dot.empty-dot { background: #cbd5e1; }
+    .seg-item .dot.filled-dot { background: var(--accent); }
+    .seg-item .seg-time { color: var(--text-muted); margin-left: auto; font-size: .78rem; }
+
+    .save-status {
+      text-align: center;
+      font-size: .82rem;
+      color: var(--accent);
+      min-height: 1.4em;
+    }
+
+    /* ---- Video selector ---- */
+    .video-selector {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .video-selector label {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .video-selector select {
+      flex: 1;
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: .88rem;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .video-selector select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Video Annotator</h1>
+  <span class="badge" id="videoBadge">—</span>
+  <span class="badge" id="totalSegments"></span>
+</header>
+
+<div class="container">
+  <!-- Left: video + timeline -->
+  <div>
+    <div class="video-panel">
+      <div class="video-selector">
+        <label for="videoSelect">Video:</label>
+        <select id="videoSelect"></select>
+      </div>
+      <video id="vid" preload="metadata">
+        Your browser does not support the video tag.
+      </video>
+
+      <div class="timeline-bar">
+        <div class="timeline-track" id="timeline">
+          <div class="timeline-playhead" id="playhead"></div>
+        </div>
+      </div>
+
+      <div class="video-controls">
+        <button class="btn-outline" id="btnPrev" title="Previous segment">&larr; Prev</button>
+        <button class="btn-primary" id="btnPlay">Play</button>
+        <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
+        <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
+        <span class="segment-indicator" id="segLabel">Segment 1 / —</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: annotation sidebar -->
+  <div class="sidebar">
+    <div class="annotation-card">
+      <h2 id="cardTitle">Segment 1</h2>
+      <div class="time-range" id="cardRange">0:00 – 0:30</div>
+      <textarea id="explanation" placeholder="Describe what is happening in this segment of the video…"></textarea>
+      <div class="card-actions">
+        <button class="btn-accent" id="btnSave">Save</button>
+        <button class="btn-outline" id="btnClear">Clear</button>
+        <button class="btn-danger" id="btnExport">Export JSON</button>
+      </div>
+    </div>
+
+    <div class="segment-list" id="segmentList">
+      <h3>All Segments</h3>
+    </div>
+
+    <div class="save-status" id="status"></div>
+  </div>
+</div>
+
+<script>
+/** Fallback if no per-video .xlsx segment sheet is found */
+const SEGMENT_DURATION = 30;
+const vid   = document.getElementById('vid');
+const timeline = document.getElementById('timeline');
+const playhead = document.getElementById('playhead');
+const videoSelect = document.getElementById('videoSelect');
+
+let segments = [];
+let annotations = {};
+let currentIdx = 0;
+let totalSegments = 0;
+let currentVideoId = '';
+/** 'excel' | 'default' */
+let segmentSource = 'default';
+let segmentSheetName = null;
+
+/* ---- Helpers ---- */
+function fmt(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function flash(msg) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  setTimeout(() => el.textContent = '', 2500);
+}
+
+/* ---- Video selection ---- */
+async function populateVideoList() {
+  const res = await fetch('/videos');
+  const videos = await res.json();
+  videoSelect.innerHTML = '';
+  videos.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.id;
+    opt.textContent = v.label;
+    videoSelect.appendChild(opt);
+  });
+  return videos;
+}
+
+async function switchVideo(videoId) {
+  if (currentVideoId) {
+    autoSaveCurrent();
+    await persistAnnotations();
+  }
+  currentVideoId = videoId;
+  document.getElementById('videoBadge').textContent = videoId + '.mp4';
+  vid.src = `/video/${videoId}`;
+  vid.load();
+}
+
+videoSelect.addEventListener('change', () => switchVideo(videoSelect.value));
+
+/* ---- Init after metadata loaded ---- */
+vid.addEventListener('loadedmetadata', async () => {
+  const dur = vid.duration;
+  segmentSource = 'default';
+  segmentSheetName = null;
+  segments = [];
+
+  let meta = null;
+  try {
+    const res = await fetch(`/segments/${currentVideoId}`);
+    if (res.ok) {
+      meta = await res.json();
+      segmentSheetName = meta.sheet || null;
+      if (meta.segments && meta.segments.length > 0) {
+        const fromSheet = meta.segments
+          .map((s, i) => ({
+            idx: typeof s.idx === 'number' ? s.idx : i,
+            start: Math.max(0, Number(s.start)),
+            end: Math.min(dur, Number(s.end)),
+            label: s.label ? String(s.label) : null,
+          }))
+          .filter((s) => s.end > s.start);
+        if (fromSheet.length > 0) {
+          segments = fromSheet.map((s, i) => ({ ...s, idx: i }));
+          segmentSource = 'excel';
+        }
+      }
+    }
+  } catch {
+    /* network: fall back below */
+  }
+
+  if (segments.length === 0) {
+    totalSegments = Math.max(1, Math.ceil(dur / SEGMENT_DURATION));
+    for (let i = 0; i < totalSegments; i++) {
+      const start = i * SEGMENT_DURATION;
+      const end = Math.min((i + 1) * SEGMENT_DURATION, dur);
+      segments.push({ idx: i, start, end, label: null });
+    }
+    document.getElementById('totalSegments').textContent =
+      `${totalSegments} segments × ${SEGMENT_DURATION} s (fixed window)`;
+    if (segmentSheetName) {
+      flash(meta?.error || 'Spreadsheet had no valid rows; using fixed windows.');
+    } else {
+      flash(
+        `No ${currentVideoId}.xlsx next to the video file; using ${SEGMENT_DURATION}s windows.`,
+      );
+    }
+  } else {
+    totalSegments = segments.length;
+    const sheetHint = segmentSheetName ? segmentSheetName : 'spreadsheet';
+    document.getElementById('totalSegments').textContent =
+      `${totalSegments} segments (${sheetHint})`;
+  }
+
+  await loadAnnotations();
+  buildTimeline();
+  buildSegmentList();
+  goToSegment(0);
+});
+
+/* ---- Bootstrap ---- */
+(async () => {
+  const videos = await populateVideoList();
+  if (videos.length > 0) {
+    videoSelect.value = videos[0].id;
+    switchVideo(videos[0].id);
+  }
+})();
+
+/* ---- Timeline rendering ---- */
+function buildTimeline() {
+  document.querySelectorAll('.timeline-segment').forEach(e => e.remove());
+  const dur = vid.duration;
+  segments.forEach(seg => {
+    const el = document.createElement('div');
+    el.className = 'timeline-segment';
+    el.style.left  = `${(seg.start / dur) * 100}%`;
+    el.style.width = `${((seg.end - seg.start) / dur) * 100}%`;
+    el.textContent  = `${seg.idx + 1}`;
+    el.dataset.idx  = seg.idx;
+    el.addEventListener('click', () => goToSegment(seg.idx));
+    timeline.appendChild(el);
+  });
+  refreshTimelineColors();
+}
+
+function refreshTimelineColors() {
+  document.querySelectorAll('.timeline-segment').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    el.classList.toggle('filled', !!annotations[idx]);
+    el.classList.toggle('empty', !annotations[idx]);
+    el.classList.toggle('active', idx === currentIdx);
+  });
+}
+
+/* ---- Segment list in sidebar ---- */
+function buildSegmentList() {
+  const list = document.getElementById('segmentList');
+  list.querySelectorAll('.seg-item').forEach(e => e.remove());
+  segments.forEach(seg => {
+    const item = document.createElement('div');
+    item.className = 'seg-item';
+    item.dataset.idx = seg.idx;
+    const title = seg.label
+      ? `${seg.label}`
+      : `Segment ${seg.idx + 1}`;
+    item.innerHTML = `
+      <span class="dot"></span>
+      <span>${title}</span>
+      <span class="seg-time">${fmt(seg.start)} – ${fmt(seg.end)}</span>
+    `;
+    item.addEventListener('click', () => goToSegment(seg.idx));
+    list.appendChild(item);
+  });
+  refreshSegmentList();
+}
+
+function refreshSegmentList() {
+  document.querySelectorAll('.seg-item').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    el.classList.toggle('active', idx === currentIdx);
+    const dot = el.querySelector('.dot');
+    dot.className = `dot ${annotations[idx] ? 'filled-dot' : 'empty-dot'}`;
+  });
+}
+
+/* ---- Navigation ---- */
+function goToSegment(idx) {
+  autoSaveCurrent();
+  currentIdx = Math.max(0, Math.min(idx, segments.length - 1));
+  const seg = segments[currentIdx];
+
+  vid.currentTime = seg.start;
+
+  const cardLabel = seg.label || `Segment ${currentIdx + 1}`;
+  document.getElementById('segLabel').textContent =
+    seg.label
+      ? `${seg.label} (${currentIdx + 1} / ${totalSegments})`
+      : `Segment ${currentIdx + 1} / ${totalSegments}`;
+  document.getElementById('cardTitle').textContent = cardLabel;
+  document.getElementById('cardRange').textContent =
+    `${fmt(seg.start)} – ${fmt(seg.end)}`;
+  document.getElementById('explanation').value = annotations[currentIdx] || '';
+
+  refreshTimelineColors();
+  refreshSegmentList();
+
+  document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
+}
+
+/* ---- Playback: pause at segment boundary ---- */
+vid.addEventListener('timeupdate', () => {
+  const seg = segments[currentIdx];
+  if (vid.currentTime >= seg.end) {
+    vid.pause();
+    updatePlayBtn();
+  }
+  const pct = (vid.currentTime / vid.duration) * 100;
+  playhead.style.left = `${pct}%`;
+});
+
+function updatePlayBtn() {
+  document.getElementById('btnPlay').textContent = vid.paused ? 'Play' : 'Pause';
+}
+
+/* ---- Button handlers ---- */
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if (vid.paused) {
+    const seg = segments[currentIdx];
+    if (vid.currentTime >= seg.end) vid.currentTime = seg.start;
+    vid.play();
+  } else {
+    vid.pause();
+  }
+  updatePlayBtn();
+});
+vid.addEventListener('pause', updatePlayBtn);
+vid.addEventListener('play', updatePlayBtn);
+
+document.getElementById('btnPrev').addEventListener('click', () => goToSegment(currentIdx - 1));
+document.getElementById('btnNext').addEventListener('click', () => goToSegment(currentIdx + 1));
+document.getElementById('btnReplay').addEventListener('click', () => {
+  vid.currentTime = segments[currentIdx].start;
+  vid.play();
+  updatePlayBtn();
+});
+
+/* ---- Save / clear / export ---- */
+function autoSaveCurrent() {
+  const text = document.getElementById('explanation').value.trim();
+  if (text) {
+    annotations[currentIdx] = text;
+  } else {
+    delete annotations[currentIdx];
+  }
+}
+
+document.getElementById('btnSave').addEventListener('click', async () => {
+  autoSaveCurrent();
+  await persistAnnotations();
+  refreshTimelineColors();
+  refreshSegmentList();
+  flash('Saved!');
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  document.getElementById('explanation').value = '';
+  delete annotations[currentIdx];
+  refreshTimelineColors();
+  refreshSegmentList();
+});
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  autoSaveCurrent();
+  const exportData = {
+    video: currentVideoId + '.mp4',
+    segment_source: segmentSource,
+    segment_sheet: segmentSheetName,
+    segment_duration_sec: segmentSource === 'excel' ? null : SEGMENT_DURATION,
+    annotated_at: new Date().toISOString(),
+    segments: segments.map(seg => ({
+      segment: seg.idx + 1,
+      step_label: seg.label || null,
+      start: fmt(seg.start),
+      end: fmt(seg.end),
+      explanation: annotations[seg.idx] || null,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `annotations_${currentVideoId}.json`;
+  a.click();
+  flash('Exported!');
+});
+
+/* ---- Persist to server ---- */
+async function persistAnnotations() {
+  await fetch(`/annotations/${currentVideoId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(annotations),
+  });
+}
+
+async function loadAnnotations() {
+  try {
+    const res = await fetch(`/annotations/${currentVideoId}`);
+    const data = await res.json();
+    annotations = {};
+    for (const [k, v] of Object.entries(data)) {
+      annotations[parseInt(k)] = v;
+    }
+  } catch { annotations = {}; }
+}
+
+/* ---- Keyboard shortcuts ---- */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); goToSegment(currentIdx - 1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); goToSegment(currentIdx + 1); }
+  if (e.key === ' ') { e.preventDefault(); document.getElementById('btnPlay').click(); }
+});
+</script>
+
+</body>
+</html>

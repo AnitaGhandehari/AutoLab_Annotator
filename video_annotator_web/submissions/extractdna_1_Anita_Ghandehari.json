@@ -1,0 +1,45 @@
+{
+  "annotator": "Anita Ghandehari",
+  "video": "extractdna_1",
+  "video_label": "Extract DNA 1",
+  "segment_duration_sec": 30,
+  "annotated_at": "2026-04-27T21:10:32.523Z",
+  "segments": [
+    {
+      "segment": 1,
+      "start": "0:00",
+      "end": "0:30",
+      "explanation": "1"
+    },
+    {
+      "segment": 2,
+      "start": "0:30",
+      "end": "1:00",
+      "explanation": "2"
+    },
+    {
+      "segment": 3,
+      "start": "1:00",
+      "end": "1:30",
+      "explanation": "3"
+    },
+    {
+      "segment": 4,
+      "start": "1:30",
+      "end": "2:00",
+      "explanation": "4"
+    },
+    {
+      "segment": 5,
+      "start": "2:00",
+      "end": "2:30",
+      "explanation": "5"
+    },
+    {
+      "segment": 6,
+      "start": "2:30",
+      "end": "2:30",
+      "explanation": "6"
+    }
+  ]
+}
