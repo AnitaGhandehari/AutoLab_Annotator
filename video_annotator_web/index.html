@@ -416,8 +416,9 @@
     }
 
     .annotation-fields-scroll {
-      flex: 1 1 auto;
-      min-height: 200px;
+      flex: 0 1 auto;
+      min-height: 0;
+      max-height: min(calc(100vh - 240px), 78vh);
       overflow-y: auto;
       padding-right: 6px;
       margin-bottom: 8px;
