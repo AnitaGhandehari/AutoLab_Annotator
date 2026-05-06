@@ -1432,7 +1432,7 @@ function emptyStructuredAnnotation() {
   return {
     equipment: '',
     materials: '',
-    steps: [''],
+    steps: [{ text: '', start_sec: null }],
     visualized_results: '',
     extra_notes: {},
   };
@@ -1464,7 +1464,11 @@ function isAnnotationEmpty(obj) {
   const steps = obj.steps;
   if (Array.isArray(steps)) {
     for (const s of steps) {
-      if (String(s || '').trim()) return false;
+      if (typeof s === 'object' && s !== null) {
+        if (String(s.text ?? '').trim()) return false;
+      } else if (String(s || '').trim()) {
+        return false;
+      }
     }
   }
   const en = normalizeExtraNotesMap(obj.extra_notes ?? obj.Extra_Notes);
@@ -1480,21 +1484,30 @@ function normalizeSegmentAnnotation(val) {
     return {
       equipment: '',
       materials: '',
-      steps: [t],
+      steps: [{ text: t, start_sec: null }],
       visualized_results: '',
       extra_notes: {},
     };
   }
   if (typeof val === 'object') {
     const stepsRaw = val.steps;
-    let steps = [''];
+    let steps = [{ text: '', start_sec: null }];
     if (Array.isArray(stepsRaw) && stepsRaw.length) {
-      steps = stepsRaw.map((s) => String(s == null ? '' : s));
+      steps = stepsRaw.map((s) => {
+        if (typeof s === 'object' && s !== null) {
+          const rawStart = Number(s.start_sec);
+          return {
+            text: String(s.text ?? '').trim(),
+            start_sec: Number.isFinite(rawStart) ? rawStart : null,
+          };
+        }
+        return { text: String(s == null ? '' : s).trim(), start_sec: null };
+      });
     }
     const legacyActions = String(val.actions ?? '').trim();
-    const stepsAllEmpty = !steps.some((s) => String(s || '').trim());
+    const stepsAllEmpty = !steps.some((s) => String(s?.text ?? '').trim());
     if (legacyActions && stepsAllEmpty) {
-      steps = [legacyActions];
+      steps = [{ text: legacyActions, start_sec: null }];
     }
     const extra_notes = normalizeExtraNotesMap(val.extra_notes ?? val.Extra_Notes);
     return {
@@ -1523,9 +1536,11 @@ function loadAnnotationsLocal() {
   } catch { annotations = {}; }
 }
 
-function createStepRow(value) {
+function createStepRow(value, startSec) {
   const wrap = document.createElement('div');
   wrap.className = 'step-row';
+  const normStart = Number(startSec);
+  wrap.dataset.startSec = Number.isFinite(normStart) ? String(normStart) : '';
   const label = document.createElement('label');
   label.className = 'step-label';
   const ta = document.createElement('textarea');
@@ -1551,11 +1566,27 @@ function createStepRow(value) {
   return wrap;
 }
 
+function getCurrentSegmentStartSec() {
+  const seg = segments[currentIdx];
+  return seg ? Number(seg.start) || 0 : 0;
+}
+
+function getCurrentPlaybackTimeInSegment() {
+  const seg = segments[currentIdx];
+  if (!seg) return 0;
+  return Math.max(seg.start, Math.min(vid.currentTime, seg.end));
+}
+
 function renumberSteps() {
   const rows = [...stepsContainer.querySelectorAll('.step-row')];
   rows.forEach((row, i) => {
     const lbl = row.querySelector('.step-label');
-    if (lbl) lbl.textContent = `Step ${i + 1}`;
+    const rawStart = Number(row.dataset.startSec);
+    const startSec = Number.isFinite(rawStart)
+      ? rawStart
+      : (i === 0 ? getCurrentSegmentStartSec() : getCurrentPlaybackTimeInSegment());
+    if (!Number.isFinite(rawStart)) row.dataset.startSec = String(startSec);
+    if (lbl) lbl.textContent = `Step ${i + 1} (${fmt(startSec)})`;
     const rm = row.querySelector('.btn-remove-step');
     if (rm) rm.style.display = rows.length > 1 ? '' : 'none';
   });
@@ -1563,17 +1594,35 @@ function renumberSteps() {
 
 function renderStepsFromData(stepStrings) {
   stepsContainer.innerHTML = '';
+  const segStart = getCurrentSegmentStartSec();
   const arr = (Array.isArray(stepStrings) && stepStrings.length)
-    ? stepStrings.map((s) => String(s ?? ''))
-    : [''];
-  arr.forEach((text) => {
-    stepsContainer.appendChild(createStepRow(text));
+    ? stepStrings.map((s, i) => {
+        if (typeof s === 'object' && s !== null) {
+          const raw = Number(s.start_sec);
+          return {
+            text: String(s.text ?? '').trim(),
+            start_sec: Number.isFinite(raw) ? raw : (i === 0 ? segStart : null),
+          };
+        }
+        return { text: String(s ?? '').trim(), start_sec: i === 0 ? segStart : null };
+      })
+    : [{ text: '', start_sec: segStart }];
+  arr.forEach((step) => {
+    stepsContainer.appendChild(createStepRow(step.text, step.start_sec));
   });
   renumberSteps();
 }
 
 function readStepsFromForm() {
-  return [...stepsContainer.querySelectorAll('.step-input')].map((ta) => ta.value.trim());
+  const rows = [...stepsContainer.querySelectorAll('.step-row')];
+  return rows.map((row) => {
+    const ta = row.querySelector('.step-input');
+    const rawStart = Number(row.dataset.startSec);
+    return {
+      text: String(ta?.value ?? '').trim(),
+      start_sec: Number.isFinite(rawStart) ? rawStart : null,
+    };
+  });
 }
 
 function createExtraNoteModalRow(timeKey, text, indexInArr) {
@@ -1686,7 +1735,7 @@ function readStructuredAnnotationFromForm() {
   return {
     equipment: document.getElementById('annEquipment').value.trim(),
     materials: document.getElementById('annMaterials').value.trim(),
-    steps: steps.length ? steps : [''],
+    steps: steps.length ? steps : [{ text: '', start_sec: getCurrentSegmentStartSec() }],
     visualized_results: document.getElementById('annVisualizedResults').value.trim(),
     extra_notes: prevExtra,
   };
@@ -1735,7 +1784,22 @@ function buildSegmentExportSlice(segIdx) {
     };
   }
   const stepList = Array.isArray(ann.steps)
-    ? ann.steps.map((s) => String(s).trim()).filter(Boolean)
+    ? ann.steps
+        .map((s) => {
+          if (typeof s === 'object' && s !== null) {
+            const text = String(s.text ?? '').trim();
+            if (!text) return null;
+            const raw = Number(s.start_sec);
+            const startSec = Number.isFinite(raw) ? raw : null;
+            return {
+              start_time: startSec == null ? null : fmt(startSec),
+              text,
+            };
+          }
+          const text = String(s ?? '').trim();
+          return text ? { start_time: null, text } : null;
+        })
+        .filter(Boolean)
     : [];
   return {
     ...base,
@@ -2342,7 +2406,7 @@ document.getElementById('btnSave').addEventListener('click', () => {
 });
 
 document.getElementById('btnAddStep').addEventListener('click', () => {
-  stepsContainer.appendChild(createStepRow(''));
+  stepsContainer.appendChild(createStepRow('', getCurrentPlaybackTimeInSegment()));
   renumberSteps();
 });
 
