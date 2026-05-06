@@ -388,9 +388,9 @@
       margin-bottom: 4px;
     }
     .card-title-line1 {
-      font-size: 1rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      color: var(--text);
+      color: var(--primary);
       line-height: 1.35;
     }
     .card-title-line2 {
@@ -2150,7 +2150,7 @@ function selectSegment(idx, opts = {}) {
   }
 
   document.getElementById('segLabel').textContent =
-    `Section ${currentIdx + 1} / ${totalSegs}`;
+    `Segment ${currentIdx + 1} / ${totalSegs}`;
 
   document.getElementById('cardTitleLine1').textContent =
     `Segment ${currentIdx + 1}:`;
@@ -2205,7 +2205,8 @@ function buildSegmentList() {
     const item = document.createElement('div');
     item.className = 'seg-item';
     item.dataset.idx = seg.idx;
-    const title = `Section ${seg.idx + 1}`;
+    const titlePrefix = seg.label ? `(${seg.label}) ` : '';
+    const title = `${titlePrefix}Segment ${seg.idx + 1}`;
     item.innerHTML = `
       <span class="dot"></span>
       <span>${title}</span>
