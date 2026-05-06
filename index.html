@@ -1232,7 +1232,7 @@
     </div>
     <div class="extra-note-modal-inner">
       <p class="extra-note-modal-time">Time in video: <strong id="extraNoteModalTimeLabel">0:00</strong></p>
-      <textarea id="extraNoteModalInput" class="ann-input" rows="4" placeholder="Type the extra information for this moment…" aria-label="Extra note text"></textarea>
+      <textarea id="extraNoteModalInput" class="ann-input" rows="4" placeholder="Type the extra information for this momentÃ¢â‚¬Â¦" aria-label="Extra note text"></textarea>
       <div class="extra-note-modal-actions">
         <button type="button" class="btn-primary" id="btnExtraNoteSave">Save note</button>
         <button type="button" class="btn-outline" id="btnExtraNoteCancel">Close</button>
@@ -1324,8 +1324,8 @@
           <p class="ann-help"><strong>Here are a few instruction hints to keep in mind:</strong></p>
           <ul class="ann-hint-list">
             <li><strong>N/A</strong>: The field doesn&rsquo;t apply to this segment (e.g., no materials used, so Materials: N/A).</li>
-            <li><strong>[Not visible: …]</strong>: The field applies, but the detail is unclear; list it and describe what you can see (e.g., unknown clear liquid &rarr; [Not visible: clear liquid]).</li>
-            <li><strong>[Not visible: …] (Steps field only)</strong>: Step details are unclear; describe what you can see (e.g., &ldquo;adds [Not visible: appears to be a white powder] to the flask&rdquo;).</li>
+            <li><strong>[Not visible: Ã¢â‚¬Â¦]</strong>: The field applies, but the detail is unclear; list it and describe what you can see (e.g., unknown clear liquid &rarr; [Not visible: clear liquid]).</li>
+            <li><strong>[Not visible: Ã¢â‚¬Â¦] (Steps field only)</strong>: Step details are unclear; describe what you can see (e.g., &ldquo;adds [Not visible: appears to be a white powder] to the flask&rdquo;).</li>
             <li><strong>[Not Visible Parameter] (Steps field only)</strong>: Placeholder for a missing number or unit (e.g., centrifuge for [Not Visible Parameter]).</li>
           </ul>
         </div>
@@ -1343,7 +1343,7 @@
         </div>
         <div class="ann-field ann-field-steps">
           <div class="ann-field-intro">
-            <span class="ann-label">3) Steps:</span> <span class="ann-help">Split this segment into ordered steps, one box per step. Include the <strong>time range</strong> within this segment and the <strong>second (or mm:ss)</strong> when each action happens (for example &ldquo;0:12 to 0:18: she opens the tube&rdquo;). Use <code>[Not Visible Parameter]</code> as a placeholder where a number or unit belongs in the sentence but is <strong>not visible in the video</strong> (duration, rpm, temperature, volume, and similar). If you cannot tell exactly what happens, use <code>[Not visible: …]</code> with your best description. Press <strong>+</strong> to add Step 2, Step 3, and so on.</span>
+            <span class="ann-label">3) Steps:</span> <span class="ann-help">Explain each step, then press the <strong>Add Step</strong> button at the start time of the next step to add a new one.</span>
           </div>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-add-step" id="btnAddStep" title="Add another step">+ Add step</button>
@@ -1352,7 +1352,7 @@
           <div class="ann-field-intro">
             <label class="ann-label" for="annVisualizedResults">4) Visualized results:</label> <span class="ann-help">Observable outcomes (color, precipitate, bands, phase).</span>
           </div>
-          <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appears…"></textarea>
+          <textarea id="annVisualizedResults" class="ann-input" rows="3" placeholder="e.g. liquid turns yellow, band appearsÃ¢â‚¬Â¦"></textarea>
         </div>
       </div>
 
@@ -2083,7 +2083,7 @@ vid.addEventListener('loadedmetadata', async () => {
   if (segments.length === 0) {
     totalSegs = Math.max(1, Math.ceil(dur / SEGMENT_DURATION));
     document.getElementById('totalSegments').textContent =
-      `${totalSegs} segments × ${SEGMENT_DURATION} s (fixed window)`;
+      `${totalSegs} segments Ãƒâ€” ${SEGMENT_DURATION} s (fixed window)`;
     segments = [];
     for (let i = 0; i < totalSegs; i++) {
       const start = i * SEGMENT_DURATION;
