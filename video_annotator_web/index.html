@@ -1058,7 +1058,6 @@
         <li><strong>steps</strong>: ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
         <li><strong>visualized_results</strong>: observable outcomes (color, bands, precipitate, phases).</li>
       </ul>
-      <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
       <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
       <ul>
         <li><code>[Not visible]</code>: this field might apply but you cannot clearly see the relevant detail, or (in <strong>Steps</strong>) the action is ambiguous. Say what you can see; in a step you may write <code>[Not visible: adds a white powder from a spatula]</code>.</li>
@@ -1079,7 +1078,7 @@
         <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
         <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Steps</strong> (with times inside the segment when each part happens), and <strong>Visualized results</strong>.</li>
-        <li>Optional: the <strong>Extra Note</strong> button (pink, next to <strong>Replay</strong>) saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
+
         <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
         <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
@@ -1183,7 +1182,6 @@
           <li><strong>steps</strong>: ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
           <li><strong>visualized_results</strong>: observable outcomes (color, bands, precipitate, phases).</li>
         </ul>
-        <p><strong>Optional <code>Extra_Notes</code>:</strong> Click the pink <strong>Extra Note</strong> button next to <strong>Replay</strong> at the exact moment you care about. A popup opens (same purple header as the <strong>Instructions</strong> window); the tool records the <strong>video time at that click</strong> and pauses playback. Type your remark and choose <strong>Save note</strong>. Entries belong to the <strong>current segment only</strong>. In JSON they appear under <code>Extra_Notes</code>: each key is a time string in <code>m:ss</code> form (for example <code>"1:05"</code>), and each key maps to a <strong>list</strong> of note strings. You can save multiple notes at the same timestamp or at many different times. Remove notes from the list inside the popup if needed.</p>
         <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
         <ul>
           <li><code>[Not visible]</code>: this field might apply but you cannot clearly see the relevant detail, or (in <strong>Steps</strong>) the action is ambiguous. Say what you can see; in a step you may write <code>[Not visible: adds a white powder from a spatula]</code>.</li>
@@ -1204,7 +1202,7 @@
           <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
           <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Steps</strong> (with times inside the segment when each part happens), and <strong>Visualized results</strong>.</li>
-          <li>Optional: the <strong>Extra Note</strong> button (pink, next to <strong>Replay</strong>) saves time-stamped text into <code>Extra_Notes</code> for the current segment (see <strong>Output Format</strong>).</li>
+  
           <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
           <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
@@ -1288,7 +1286,7 @@
         <button class="btn-primary" id="btnPlay">Play</button>
         <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
         <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
-        <button class="btn-extra-note" id="btnExtraNote" title="Add an extra note at the current playback time">Extra Note</button>
+
         <span class="segment-indicator" id="segLabel">Segment 1 / ...</span>
       </div>
     </div>
