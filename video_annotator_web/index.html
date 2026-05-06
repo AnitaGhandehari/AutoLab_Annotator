@@ -388,15 +388,15 @@
       margin-bottom: 4px;
     }
     .card-title-line1 {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--text);
       line-height: 1.35;
     }
     .card-title-line2 {
-      font-size: .92rem;
-      font-weight: 500;
-      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
       line-height: 1.45;
       margin-top: 2px;
     }
@@ -655,7 +655,26 @@
     }
     .seg-item .dot.empty-dot { background: #cbd5e1; }
     .seg-item .dot.filled-dot { background: var(--accent); }
-    .seg-item .seg-time { color: var(--text-muted); margin-left: auto; font-size: .78rem; }
+    .seg-item .seg-item-main {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-width: 0;
+      flex: 1;
+    }
+    .seg-item .seg-num {
+      font-size: .84rem;
+      color: var(--text);
+      font-weight: inherit;
+    }
+    .seg-item .seg-desc {
+      font-size: .78rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .seg-item.active .seg-desc { font-weight: 400; }
+    .seg-item .seg-time { color: var(--text-muted); margin-left: auto; font-size: .78rem; flex-shrink: 0; }
 
     .btn-done {
       width: 100%;
@@ -2205,13 +2224,26 @@ function buildSegmentList() {
     const item = document.createElement('div');
     item.className = 'seg-item';
     item.dataset.idx = seg.idx;
-    const titlePrefix = seg.label ? `(${seg.label}) ` : '';
-    const title = `${titlePrefix}Segment ${seg.idx + 1}`;
-    item.innerHTML = `
-      <span class="dot"></span>
-      <span>${title}</span>
-      <span class="seg-time">${fmt(seg.start)} to ${fmt(seg.end)}</span>
-    `;
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    const main = document.createElement('span');
+    main.className = 'seg-item-main';
+    const numEl = document.createElement('span');
+    numEl.className = 'seg-num';
+    numEl.textContent = `Segment ${seg.idx + 1}`;
+    main.appendChild(numEl);
+    if (seg.label) {
+      const desc = document.createElement('span');
+      desc.className = 'seg-desc';
+      desc.textContent = `(${seg.label})`;
+      main.appendChild(desc);
+    }
+    const timeEl = document.createElement('span');
+    timeEl.className = 'seg-time';
+    timeEl.textContent = `${fmt(seg.start)} to ${fmt(seg.end)}`;
+    item.appendChild(dot);
+    item.appendChild(main);
+    item.appendChild(timeEl);
     item.addEventListener('click', () => goToSegment(seg.idx));
     list.appendChild(item);
   });
