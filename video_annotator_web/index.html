@@ -1917,10 +1917,8 @@ function buildSegmentExportSlice(segIdx) {
       ...base,
       equipment: null,
       materials: null,
-      actions: null,
       steps: [],
       visualized_results: null,
-      Extra_Notes: null,
     };
   }
   const stepList = Array.isArray(ann.steps)
@@ -1941,15 +1939,15 @@ function buildSegmentExportSlice(segIdx) {
         })
         .filter(Boolean)
     : [];
-  return {
+  const out = {
     ...base,
     equipment: ann.equipment.trim() || null,
     materials: ann.materials.trim() || null,
-    actions: null,
     steps: stepList,
     visualized_results: ann.visualized_results.trim() || null,
-    Extra_Notes: hasExtra ? extraSorted : null,
   };
+  if (hasExtra) out.Extra_Notes = extraSorted;
+  return out;
 }
 
 function segmentExportHasContent(s) {
