@@ -1406,6 +1406,10 @@ let currentUser  = null; // { first, last }
 let initialized  = false;
 /** Incremented on each metadata load so stale spreadsheet fetches are ignored after video switches. */
 let segmentLoadToken = 0;
+/** Set before switchVideo when restoring session; consumed in loadedmetadata. */
+let resumeAfterLoad = null;
+
+const UI_RESUME_KEY = 'autolab_ui_resume';
 
 /* LOCAL STORAGE: all annotations stored per-user per-video.
    Key format: "autolab_<first>_<last>_<videoId>" */
@@ -1413,6 +1417,37 @@ function storageKey(videoId) {
   const l = (currentUser.last || '').trim();
   const lastPart = l || '_single';
   return `autolab_${currentUser.first}_${lastPart}_${videoId || currentVideoId}`;
+}
+
+/** Persists last video / segment / time for refresh (scoped to current login). */
+function saveUiState() {
+  if (!currentUser || !currentVideoId) return;
+  try {
+    localStorage.setItem(
+      UI_RESUME_KEY,
+      JSON.stringify({
+        first: currentUser.first,
+        last: currentUser.last || '',
+        videoId: currentVideoId,
+        segmentIdx: currentIdx,
+        currentTime:
+          vid && Number.isFinite(vid.currentTime) ? vid.currentTime : null,
+      }),
+    );
+  } catch (_) {}
+}
+
+function readUiResume() {
+  if (!currentUser) return null;
+  try {
+    const raw = localStorage.getItem(UI_RESUME_KEY);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (o.first !== currentUser.first || (o.last || '') !== (currentUser.last || '')) return null;
+    return o;
+  } catch {
+    return null;
+  }
 }
 
 function saveAnnotationsLocal() {
@@ -2041,6 +2076,9 @@ document.getElementById('btnLogout').addEventListener('click', () => {
   saveAnnotationsLocal();
   localStorage.removeItem('autolab_user');
   localStorage.removeItem('autolab_instructions_seen');
+  try {
+    localStorage.removeItem(UI_RESUME_KEY);
+  } catch (_) {}
   currentUser = null;
   document.getElementById('loginOverlay').classList.remove('hidden');
   document.getElementById('instructionsOverlay').classList.add('hidden');
@@ -2078,6 +2116,8 @@ document.getElementById('btnStartAnnotating').addEventListener('click', () => {
 });
 
 function enterApp() {
+  document.getElementById('instructionsOverlay').classList.add('hidden');
+  document.getElementById('instrFooter').classList.add('hidden');
   document.getElementById('userDisplay').textContent = displayUserName();
   populateVideoList();
 }
@@ -2091,14 +2131,27 @@ function populateVideoList() {
     opt.textContent = v.label;
     videoSelect.appendChild(opt);
   });
-  if (VIDEOS.length > 0) {
-    videoSelect.value = VIDEOS[0].id;
-    switchVideo(VIDEOS[0].id);
+  if (VIDEOS.length === 0) return;
+  const resume = readUiResume();
+  const pick =
+    resume && VIDEOS.some((v) => v.id === resume.videoId)
+      ? resume.videoId
+      : VIDEOS[0].id;
+  if (resume && resume.videoId === pick && Number.isFinite(Number(resume.segmentIdx))) {
+    resumeAfterLoad = {
+      segmentIdx: Number(resume.segmentIdx),
+      currentTime: Number.isFinite(Number(resume.currentTime)) ? Number(resume.currentTime) : null,
+    };
+  } else {
+    resumeAfterLoad = null;
   }
+  videoSelect.value = pick;
+  switchVideo(pick);
 }
 
 function switchVideo(videoId) {
   if (currentVideoId && initialized) {
+    saveUiState();
     autoSaveCurrent();
     saveAnnotationsLocal();
   }
@@ -2157,7 +2210,30 @@ vid.addEventListener('loadedmetadata', async () => {
   buildTimeline();
   buildSegmentList();
   updateProgress();
-  goToSegment(0);
+  let idx = 0;
+  let resumeTime = null;
+  if (resumeAfterLoad && segments.length > 0) {
+    idx = Math.max(
+      0,
+      Math.min(resumeAfterLoad.segmentIdx, segments.length - 1),
+    );
+    resumeTime = resumeAfterLoad.currentTime;
+  }
+  resumeAfterLoad = null;
+  goToSegment(idx);
+  if (
+    resumeTime != null &&
+    Number.isFinite(resumeTime) &&
+    segments[idx]
+  ) {
+    const seg = segments[idx];
+    if (resumeTime >= seg.start && resumeTime <= seg.end + 0.05) {
+      vid.currentTime = resumeTime;
+      updateTimelineDisplay();
+      updateTimelineActiveShade();
+    }
+  }
+  saveUiState();
 });
 
 function segmentIndexAtTime(t) {
@@ -2263,6 +2339,7 @@ function selectSegment(idx, opts = {}) {
 
   document.querySelector('.seg-item.active')?.scrollIntoView({ block: 'nearest' });
   initialized = true;
+  saveUiState();
 }
 
 function goToSegment(idx) {
@@ -2598,6 +2675,26 @@ document.addEventListener('keydown', e => {
 });
 
 /* BOOT */
+window.addEventListener('beforeunload', () => {
+  if (!currentUser || !currentVideoId) return;
+  saveUiState();
+  try {
+    if (initialized) {
+      autoSaveCurrent();
+      saveAnnotationsLocal();
+    }
+  } catch (_) {}
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'hidden' || !currentUser) return;
+  saveUiState();
+  try {
+    if (initialized) {
+      autoSaveCurrent();
+      saveAnnotationsLocal();
+    }
+  } catch (_) {}
+});
 checkExistingSession();
 </script>
 
