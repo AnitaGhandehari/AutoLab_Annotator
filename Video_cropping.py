@@ -21,6 +21,11 @@ JOBS = [
         "output_dir": os.path.join(BASE, "videos", "gel", "Resized"),
         "output_name": "gel_1.mp4",
     },
+    {
+        "input_path": os.path.join(BASE, "videos", "purifydna", "purifydna_1.mp4"),
+        "output_dir": os.path.join(BASE, "videos", "purifydna", "Resized"),
+        "output_name": "purifydna_1.mp4",
+    },
 ]
 
 TARGET_WIDTH = 1280

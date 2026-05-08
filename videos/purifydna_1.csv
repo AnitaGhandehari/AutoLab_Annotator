@@ -1,0 +1,20 @@
+﻿action sentence,start,end
+Take a Gel Band Cutter to slice the DNA fragment from an agarose gel.,5,39
+Transfer the gel slice into a labeled microfuge tube.,42,50
+Add 500 µl of Binding Buffer GP1 to the sample.,60,91
+Mix by vortexing.,92,102
+Incubate at 55℃ for 10-15 minutes until the gel slice has been completely dissolved.,104,111
+Invert the tube every 2-3 minutes.,112,118
+Place a FastGene® GP Column into a Collection Tube.,123,131
+Apply up to 800 µl of the sample mixture from previous step into the FastGene® GP Column.,134,164
+"Centrifuge at 13,000 rpm for 30 seconds.",174,200
+Discard the flow-through.,209,214
+Place the FastGene® GP Column back into the Collection Tube.,215,218
+Add 600 µl Wash Buffer GP2 to the FastGene® GP Column.,220,257
+"Centrifuge at 13,000 rpm for 30 seconds.",267,282
+Discard the flow-through.s,299,304
+Place the FastGene® GP Column back into the Collection Tube.,305,307
+"Centrifuge again for 2 minutes at 13,000 rpm to dry the column matrix.",314,335
+Transfer FastGene® GP Column into a new microcentrifuge tube.,359,368
+Add 20 ml of Elution Buffer GP3 to the centre of the column matrix.,368,403
+"Centrifuge at 13,000 rpm for 2 min to elute purified DNA.",423,433
