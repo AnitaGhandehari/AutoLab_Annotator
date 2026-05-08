@@ -1058,30 +1058,7 @@
     </div>
 
     <div class="instr-section">
-      <h2><span class="step-num">4</span> JSON export & special labels</h2>
-      <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the four panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
-      <ul>
-        <li><strong>equipment</strong>: apparatus and instruments you see.</li>
-        <li><strong>materials</strong>: consumables, reagents, tubes, samples.</li>
-        <li><strong>steps</strong>: ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
-        <li><strong>visualized_results</strong>: observable outcomes (color changes, bands, precipitate, phases).</li>
-      </ul>
-      <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
-      <ul>
-        <li><code>[Not visible]</code>: this field might apply but you cannot clearly see the relevant detail, or (in <strong>Steps</strong>) the action is ambiguous. Say what you can see; in a step you may write <code>[Not visible: adds a white powder from a spatula]</code>.</li>
-        <li><code>N/A</code>: this field does not apply to this segment.</li>
-        <li><code>[Not Visible Parameter]</code>: use in <strong>Steps</strong> when a number or unit belongs in the sentence but is <strong>not visible in the video</strong> (duration, rpm, temperature, volume, and similar). Put the tag exactly where that value would appear, as in section 3.</li>
-      </ul>
-      <div class="instr-example">
-        <strong>Step formatting example:</strong><br/>
-        <strong>Step 1:</strong> 0:00 to 0:08: She attaches a disposable tip to a P200 micropipette.<br/>
-        <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
-        <strong>Step 3:</strong> 0:22 to 0:26: She caps the receiving tube and inverts it three times to mix.
-      </div>
-    </div>
-
-    <div class="instr-section">
-      <h2><span class="step-num">5</span> How This Tool Works</h2>
+      <h2><span class="step-num">4</span> How This Tool Works</h2>
       <ol>
         <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
         <li>Watch a segment using the <strong>Play</strong> button.</li>
@@ -1180,30 +1157,7 @@
       </div>
 
       <div class="instr-section">
-        <h2><span class="step-num">4</span> JSON export & special labels</h2>
-        <p>Each video is divided into <strong>segments</strong> (from the spreadsheet next to the file when available; otherwise fixed-length chunks). For <strong>every segment</strong> you complete the four panels on the right. In the downloaded or submitted JSON, that becomes one object per segment with (among other metadata) these fields:</p>
-        <ul>
-          <li><strong>equipment</strong>: apparatus and instruments you see.</li>
-          <li><strong>materials</strong>: consumables, reagents, tubes, samples.</li>
-          <li><strong>steps</strong>: ordered strings, one per step box. In each step, give the <strong>time range</strong> within that segment and the <strong>moment (mm:ss)</strong> when the action occurs, then describe it (use clear verbs).</li>
-          <li><strong>visualized_results</strong>: observable outcomes (color changes, bands, precipitate, phases).</li>
-        </ul>
-        <p><strong>Special labels</strong> (type them exactly so automated checks can find them):</p>
-        <ul>
-          <li><code>[Not visible]</code>: this field might apply but you cannot clearly see the relevant detail, or (in <strong>Steps</strong>) the action is ambiguous. Say what you can see; in a step you may write <code>[Not visible: adds a white powder from a spatula]</code>.</li>
-          <li><code>N/A</code>: this field does not apply to this segment.</li>
-          <li><code>[Not Visible Parameter]</code>: use in <strong>Steps</strong> when a number or unit belongs in the sentence but is <strong>not visible in the video</strong> (duration, rpm, temperature, volume, and similar). Put the tag exactly where that value would appear, as in section 3.</li>
-        </ul>
-        <div class="instr-example">
-          <strong>Step formatting example:</strong><br/>
-          <strong>Step 1:</strong> 0:00 to 0:08: She attaches a disposable tip to a P200 micropipette.<br/>
-          <strong>Step 2:</strong> At about 0:12: She aspirates 20 &micro;L from a 1.5 mL microcentrifuge tube containing a clear colorless liquid and dispenses it into a second microcentrifuge tube.<br/>
-          <strong>Step 3:</strong> 0:22 to 0:26: She caps the receiving tube and inverts it three times to mix.
-        </div>
-      </div>
-
-      <div class="instr-section">
-        <h2><span class="step-num">5</span> How This Tool Works</h2>
+        <h2><span class="step-num">4</span> How This Tool Works</h2>
         <ol>
           <li>Each video uses a matching spreadsheet next to the MP4 (<code>videos/&lt;name&gt;.xlsx</code> or <code>.csv</code>) with <strong>start</strong> and <strong>end</strong> times in seconds per step; if neither file is present, the app uses fixed 30-second segments.</li>
           <li>Watch a segment using the <strong>Play</strong> button.</li>
