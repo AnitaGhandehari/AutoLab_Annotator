@@ -900,6 +900,37 @@
       font-weight: 700;
     }
 
+    /* Inline pills matching real control colors (instructions) */
+    .instr-btn {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      vertical-align: baseline;
+      margin: 0 2px;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+    .instr-btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .instr-btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+    .instr-btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 2px 9px;
+    }
+    .instr-btn-done {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+    }
+
     .instr-footer {
       position: fixed;
       bottom: 0;
@@ -1060,17 +1091,17 @@
     <div class="instr-section">
       <h2><span class="step-num">4</span> How This Tool Works</h2>
       <ol>
-        <li>Watch a segment using the <strong>Play</strong> button.</li>
+        <li>Watch a segment using the <span class="instr-btn instr-btn-primary">Play</span> button.</li>
         <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Steps</strong> (with times inside the segment when each part happens), and <strong>Visualized results</strong>.</li>
 
-        <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
+        <li>Click <span class="instr-btn instr-btn-accent">Save</span> (or simply move to the next segment, it auto-saves).</li>
         <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
-        <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
+        <li>When finished: use <span class="instr-btn instr-btn-primary">Export JSON</span> to download a copy of your work. To submit to the project, click <span class="instr-btn instr-btn-done">Done. Submit Annotations</span> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
       </ol>
       <div class="instr-tip">
         <strong>Keyboard shortcuts:</strong>
-        <strong>Space</strong> = play/pause,
-        <strong>Left/Right arrows</strong> = previous/next segment.
+        <strong>Space</strong> = same as <span class="instr-btn instr-btn-primary">Play</span> / pause.
+        <strong>Left/Right arrows</strong> = <span class="instr-btn instr-btn-outline">&larr; Prev</span> / <span class="instr-btn instr-btn-outline">Next &rarr;</span>.
         Your progress is <strong>auto-saved</strong> in your browser. You can close the page and come back anytime.
       </div>
     </div>
@@ -1158,17 +1189,17 @@
       <div class="instr-section">
         <h2><span class="step-num">4</span> How This Tool Works</h2>
         <ol>
-          <li>Watch a segment using the <strong>Play</strong> button.</li>
+          <li>Watch a segment using the <span class="instr-btn instr-btn-primary">Play</span> button.</li>
           <li>Fill in <strong>Equipment</strong>, <strong>Materials</strong>, <strong>Steps</strong> (with times inside the segment when each part happens), and <strong>Visualized results</strong>.</li>
   
-          <li>Click <strong>Save</strong> (or simply move to the next segment, it auto-saves).</li>
+          <li>Click <span class="instr-btn instr-btn-accent">Save</span> (or simply move to the next segment, it auto-saves).</li>
           <li>Repeat for every segment. Use the <strong>Video</strong> dropdown to switch between videos.</li>
-          <li>When finished: use <strong>Export JSON</strong> to download a copy of your work. To submit to the project, click <strong>Done. Submit Annotations</strong> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
+          <li>When finished: use <span class="instr-btn instr-btn-primary">Export JSON</span> to download a copy of your work. To submit to the project, click <span class="instr-btn instr-btn-done">Done. Submit Annotations</span> under the sidebar (confirm in the dialog). It uploads your JSON and notifies the lead; follow whichever method your coordinator asked for.</li>
         </ol>
         <div class="instr-tip">
           <strong>Keyboard shortcuts:</strong>
-          <strong>Space</strong> = play/pause,
-          <strong>Left/Right arrows</strong> = previous/next segment.
+          <strong>Space</strong> = same as <span class="instr-btn instr-btn-primary">Play</span> / pause.
+          <strong>Left/Right arrows</strong> = <span class="instr-btn instr-btn-outline">&larr; Prev</span> / <span class="instr-btn instr-btn-outline">Next &rarr;</span>.
           Your progress is <strong>auto-saved</strong> in your browser. You can close the page and come back anytime.
         </div>
       </div>
