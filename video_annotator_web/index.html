@@ -1403,6 +1403,8 @@ let currentVideoId = '';
 let segmentSource = 'default'; // 'spreadsheet' | 'default'
 let currentUser  = null; // { first, last }
 let initialized  = false;
+/** Incremented on each metadata load so stale spreadsheet fetches are ignored after video switches. */
+let segmentLoadToken = 0;
 
 /* LOCAL STORAGE: all annotations stored per-user per-video.
    Key format: "autolab_<first>_<last>_<videoId>" */
@@ -1878,8 +1880,7 @@ function parseSegmentWorkbook(workbook, dur, sheetFile) {
     return { segments: [], error: `Could not find start/end columns. Found: ${headers.join(', ')}` };
   }
   const labelCol = pickColumn(colByKey, [
-    'step', 'label', 'name', 'phase', 'description', 'procedure', 'activity',
-    'action_sentence',
+    'action_sentence', 'action sentence', 'action', 'step', 'label', 'name', 'phase', 'description', 'procedure', 'activity',
   ]);
   const raw = [];
   for (const row of rows) {
@@ -1931,7 +1932,7 @@ async function loadSegmentsFromSpreadsheet(entry, dur) {
     const url = base + ext;
     let res;
     try {
-      res = await fetch(url);
+      res = await fetch(url, { cache: 'no-store' });
     } catch {
       lastError = `Could not fetch ${url.split('/').pop()}`;
       continue;
@@ -2112,6 +2113,7 @@ videoSelect.addEventListener('change', () => switchVideo(videoSelect.value));
 
 /* INIT AFTER VIDEO METADATA LOADED */
 vid.addEventListener('loadedmetadata', async () => {
+  const loadToken = ++segmentLoadToken;
   const dur = vid.duration;
   const videoIdWhenLoaded = currentVideoId;
   const entry = VIDEOS.find((v) => v.id === videoIdWhenLoaded);
@@ -2121,7 +2123,7 @@ vid.addEventListener('loadedmetadata', async () => {
   let sheetMsg = null;
   if (entry) {
     const parsed = await loadSegmentsFromSpreadsheet(entry, dur);
-    if (videoIdWhenLoaded !== currentVideoId) return;
+    if (loadToken !== segmentLoadToken || videoIdWhenLoaded !== currentVideoId) return;
     if (parsed.segments.length > 0) {
       segments = parsed.segments;
       segmentSource = 'spreadsheet';
@@ -2132,10 +2134,12 @@ vid.addEventListener('loadedmetadata', async () => {
     }
   }
 
+  if (loadToken !== segmentLoadToken || videoIdWhenLoaded !== currentVideoId) return;
+
   if (segments.length === 0) {
     totalSegs = Math.max(1, Math.ceil(dur / SEGMENT_DURATION));
     document.getElementById('totalSegments').textContent =
-      `${totalSegs} segments Ãƒâ€” ${SEGMENT_DURATION} s (fixed window)`;
+      `${totalSegs} segments x ${SEGMENT_DURATION} s (fixed window)`;
     segments = [];
     for (let i = 0; i < totalSegs; i++) {
       const start = i * SEGMENT_DURATION;
