@@ -1275,6 +1275,7 @@
         <button class="btn-primary" id="btnPlay">Play</button>
         <button class="btn-outline" id="btnNext" title="Next segment">Next &rarr;</button>
         <button class="btn-outline" id="btnReplay" title="Replay current segment">Replay</button>
+        <button type="button" class="btn-extra-note" id="btnExtraNote" title="Save a timed note for this moment in the video">Extra note</button>
 
         <span class="segment-indicator" id="segLabel">Segment 1 / ...</span>
       </div>
@@ -2634,9 +2635,12 @@ document.getElementById('btnAddStep').addEventListener('click', () => {
   renumberSteps();
 });
 
-document.getElementById('btnExtraNote').addEventListener('click', () => {
-  openExtraNoteModal();
-});
+const btnExtraNoteEl = document.getElementById('btnExtraNote');
+if (btnExtraNoteEl) {
+  btnExtraNoteEl.addEventListener('click', () => {
+    openExtraNoteModal();
+  });
+}
 
 document.getElementById('btnExtraNoteSave').addEventListener('click', () => {
   saveExtraNoteFromModal();
