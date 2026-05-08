@@ -1,0 +1,264 @@
+{
+  "annotator": "Anita Ghandehari",
+  "video": "purifydna_1",
+  "video_label": "Purify DNA 1",
+  "segment_source": "spreadsheet",
+  "segment_duration_sec": null,
+  "annotated_at": "2026-05-08T07:12:36.604Z",
+  "segments": [
+    {
+      "segment": 1,
+      "step_label": "Take a Gel Band Cutter to slice the DNA fragment from an agarose gel.",
+      "start": "0:05",
+      "end": "0:39",
+      "equipment": "zfdSfSEf",
+      "materials": "SFDdfSDf",
+      "actions": null,
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "SfDfDSF"
+        },
+        {
+          "start_time": "0:05",
+          "text": "FDfSFSd"
+        }
+      ],
+      "visualized_results": "FdfDfs",
+      "Extra_Notes": null
+    },
+    {
+      "segment": 2,
+      "step_label": "Transfer the gel slice into a labeled microfuge tube.",
+      "start": "0:42",
+      "end": "0:50",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 3,
+      "step_label": "Add 500 µl of Binding Buffer GP1 to the sample.",
+      "start": "1:00",
+      "end": "1:31",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 4,
+      "step_label": "Mix by vortexing.",
+      "start": "1:32",
+      "end": "1:42",
+      "equipment": "1232323",
+      "materials": "fadfdf",
+      "actions": null,
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "1"
+        },
+        {
+          "start_time": "1:32",
+          "text": "2"
+        },
+        {
+          "start_time": "1:32",
+          "text": "4"
+        },
+        {
+          "start_time": "1:32",
+          "text": "5"
+        }
+      ],
+      "visualized_results": "yyyyyyyyyyyyyyyyyyyy",
+      "Extra_Notes": null
+    },
+    {
+      "segment": 5,
+      "step_label": "Incubate at 55℃ for 10-15 minutes until the gel slice has been completely dissolved.",
+      "start": "1:44",
+      "end": "1:51",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 6,
+      "step_label": "Invert the tube every 2-3 minutes.",
+      "start": "1:52",
+      "end": "1:58",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 7,
+      "step_label": "Place a FastGene® GP Column into a Collection Tube.",
+      "start": "2:03",
+      "end": "2:11",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 8,
+      "step_label": "Apply up to 800 µl of the sample mixture from previous step into the FastGene® GP Column.",
+      "start": "2:14",
+      "end": "2:44",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 9,
+      "step_label": "Centrifuge at 13,000 rpm for 30 seconds.",
+      "start": "2:54",
+      "end": "3:20",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 10,
+      "step_label": "Discard the flow-through.",
+      "start": "3:29",
+      "end": "3:34",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 11,
+      "step_label": "Place the FastGene® GP Column back into the Collection Tube.",
+      "start": "3:35",
+      "end": "3:38",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 12,
+      "step_label": "Add 600 µl Wash Buffer GP2 to the FastGene® GP Column.",
+      "start": "3:40",
+      "end": "4:17",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 13,
+      "step_label": "Centrifuge at 13,000 rpm for 30 seconds.",
+      "start": "4:27",
+      "end": "4:42",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 14,
+      "step_label": "Discard the flow-through.s",
+      "start": "4:59",
+      "end": "5:04",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 15,
+      "step_label": "Place the FastGene® GP Column back into the Collection Tube.",
+      "start": "5:05",
+      "end": "5:07",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 16,
+      "step_label": "Centrifuge again for 2 minutes at 13,000 rpm to dry the column matrix.",
+      "start": "5:14",
+      "end": "5:35",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 17,
+      "step_label": "Transfer FastGene® GP Column into a new microcentrifuge tube.",
+      "start": "5:59",
+      "end": "6:08",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 18,
+      "step_label": "Add 20 ml of Elution Buffer GP3 to the centre of the column matrix.",
+      "start": "6:08",
+      "end": "6:43",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    },
+    {
+      "segment": 19,
+      "step_label": "Centrifuge at 13,000 rpm for 2 min to elute purified DNA.",
+      "start": "7:03",
+      "end": "7:13",
+      "equipment": null,
+      "materials": null,
+      "actions": null,
+      "steps": [],
+      "visualized_results": null,
+      "Extra_Notes": null
+    }
+  ]
+}
