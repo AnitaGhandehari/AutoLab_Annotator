@@ -1411,6 +1411,119 @@ let resumeAfterLoad = null;
 
 const UI_RESUME_KEY = 'autolab_ui_resume';
 
+/** Which full-page screen to restore after refresh: login | welcome | annotator */
+const VIEW_KEY = 'autolab_view';
+const VIEW_LOGIN = 'login';
+const VIEW_WELCOME = 'welcome';
+const VIEW_ANNOTATOR = 'annotator';
+const MODAL_INSTR_KEY = 'autolab_instr_modal_open';
+
+function persistView(view) {
+  try {
+    localStorage.setItem(VIEW_KEY, view);
+  } catch (_) {}
+  try {
+    sessionStorage.setItem(VIEW_KEY, view);
+  } catch (_) {}
+}
+
+function readView() {
+  try {
+    return localStorage.getItem(VIEW_KEY) || sessionStorage.getItem(VIEW_KEY);
+  } catch (_) {
+    return null;
+  }
+}
+
+function persistInstructionsSeen() {
+  try {
+    localStorage.setItem('autolab_instructions_seen', 'true');
+  } catch (_) {}
+  try {
+    sessionStorage.setItem('autolab_instructions_seen', 'true');
+  } catch (_) {}
+}
+
+function readInstructionsSeen() {
+  try {
+    return !!(
+      localStorage.getItem('autolab_instructions_seen')
+      || sessionStorage.getItem('autolab_instructions_seen')
+    );
+  } catch (_) {
+    return false;
+  }
+}
+
+function readUserBlob() {
+  try {
+    return localStorage.getItem('autolab_user') || sessionStorage.getItem('autolab_user');
+  } catch (_) {
+    return null;
+  }
+}
+
+/** Clears login session and navigation flags from both storages (not annotation blobs). */
+function clearStoredSession() {
+  const keys = [
+    'autolab_user',
+    'autolab_instructions_seen',
+    VIEW_KEY,
+    MODAL_INSTR_KEY,
+    UI_RESUME_KEY,
+  ];
+  for (const k of keys) {
+    try {
+      localStorage.removeItem(k);
+    } catch (_) {}
+    try {
+      sessionStorage.removeItem(k);
+    } catch (_) {}
+  }
+}
+
+function applyView(view) {
+  const loginEl = document.getElementById('loginOverlay');
+  const instrEl = document.getElementById('instructionsOverlay');
+  const instrFooter = document.getElementById('instrFooter');
+  if (view === VIEW_LOGIN) {
+    loginEl.classList.remove('hidden');
+    instrEl.classList.add('hidden');
+    instrFooter.classList.add('hidden');
+  } else if (view === VIEW_WELCOME) {
+    loginEl.classList.add('hidden');
+    instrEl.classList.remove('hidden');
+    instrFooter.classList.remove('hidden');
+  } else if (view === VIEW_ANNOTATOR) {
+    loginEl.classList.add('hidden');
+    instrEl.classList.add('hidden');
+    instrFooter.classList.add('hidden');
+  }
+}
+
+function persistInstrModalOpen(isOpen) {
+  try {
+    if (isOpen) {
+      localStorage.setItem(MODAL_INSTR_KEY, '1');
+      sessionStorage.setItem(MODAL_INSTR_KEY, '1');
+    } else {
+      localStorage.removeItem(MODAL_INSTR_KEY);
+      sessionStorage.removeItem(MODAL_INSTR_KEY);
+    }
+  } catch (_) {}
+}
+
+function readInstrModalOpen() {
+  try {
+    return (
+      localStorage.getItem(MODAL_INSTR_KEY) === '1'
+      || sessionStorage.getItem(MODAL_INSTR_KEY) === '1'
+    );
+  } catch (_) {
+    return false;
+  }
+}
+
 /* LOCAL STORAGE: all annotations stored per-user per-video.
    Key format: "autolab_<first>_<last>_<videoId>" */
 function storageKey(videoId) {
@@ -2017,27 +2130,59 @@ function annotatorSlug() {
 }
 
 function checkExistingSession() {
-  try {
-    const saved = localStorage.getItem('autolab_user');
-    if (!saved) return;
-    const parsed = JSON.parse(saved);
-    if (!parsed || typeof parsed.first !== 'string' || !parsed.first.trim()) {
-      localStorage.removeItem('autolab_user');
-      return;
-    }
-    currentUser = {
-      first: parsed.first.trim(),
-      last: typeof parsed.last === 'string' ? parsed.last.trim() : '',
-    };
-    if (localStorage.getItem('autolab_instructions_seen')) {
-      document.getElementById('loginOverlay').classList.add('hidden');
-      enterApp();
-    } else {
-      showInstructions();
-    }
-  } catch {
-    try { localStorage.removeItem('autolab_user'); } catch (_) {}
+  const saved = readUserBlob();
+  if (!saved) {
+    persistView(VIEW_LOGIN);
+    applyView(VIEW_LOGIN);
+    return;
   }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(saved);
+  } catch {
+    clearStoredSession();
+    persistView(VIEW_LOGIN);
+    applyView(VIEW_LOGIN);
+    return;
+  }
+
+  if (!parsed || typeof parsed.first !== 'string' || !parsed.first.trim()) {
+    clearStoredSession();
+    persistView(VIEW_LOGIN);
+    applyView(VIEW_LOGIN);
+    return;
+  }
+
+  currentUser = {
+    first: parsed.first.trim(),
+    last: typeof parsed.last === 'string' ? parsed.last.trim() : '',
+  };
+
+  let view = readView();
+  const instructionsSeen = readInstructionsSeen();
+
+  if (view !== VIEW_WELCOME && view !== VIEW_ANNOTATOR) {
+    view = instructionsSeen ? VIEW_ANNOTATOR : VIEW_WELCOME;
+    persistView(view);
+  }
+
+  if (view === VIEW_WELCOME) {
+    applyView(VIEW_WELCOME);
+    return;
+  }
+
+  if (view === VIEW_ANNOTATOR) {
+    applyView(VIEW_ANNOTATOR);
+    enterApp();
+    if (readInstrModalOpen()) {
+      document.getElementById('instrModal').classList.remove('hidden');
+    }
+    return;
+  }
+
+  persistView(VIEW_LOGIN);
+  applyView(VIEW_LOGIN);
 }
 
 document.getElementById('loginBtn').addEventListener('click', () => {
@@ -2053,14 +2198,23 @@ document.getElementById('loginBtn').addEventListener('click', () => {
   err.textContent = '';
   currentUser = { first, last };
 
+  const blob = JSON.stringify(currentUser);
   try {
-    localStorage.setItem('autolab_user', JSON.stringify(currentUser));
+    localStorage.setItem('autolab_user', blob);
   } catch (e) {
-    err.textContent = 'This browser blocked saving your login (often in private mode). Try a regular window or allow site storage, then click again.';
-    console.error(e);
-    return;
+    try {
+      sessionStorage.setItem('autolab_user', blob);
+    } catch (e2) {
+      err.textContent = 'This browser blocked saving your login (often in private mode). Try a regular window or allow site storage, then click again.';
+      console.error(e2);
+      return;
+    }
   }
+  try {
+    sessionStorage.setItem('autolab_user', blob);
+  } catch (_) {}
 
+  persistView(VIEW_WELCOME);
   showInstructions();
 });
 
@@ -2074,30 +2228,29 @@ document.getElementById('lastName').addEventListener('keydown', e => {
 document.getElementById('btnLogout').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
-  localStorage.removeItem('autolab_user');
-  localStorage.removeItem('autolab_instructions_seen');
-  try {
-    localStorage.removeItem(UI_RESUME_KEY);
-  } catch (_) {}
+  clearStoredSession();
   currentUser = null;
-  document.getElementById('loginOverlay').classList.remove('hidden');
-  document.getElementById('instructionsOverlay').classList.add('hidden');
-  document.getElementById('instrFooter').classList.add('hidden');
+  document.getElementById('instrModal').classList.add('hidden');
+  persistView(VIEW_LOGIN);
+  applyView(VIEW_LOGIN);
 });
 
 document.getElementById('btnViewInstructions').addEventListener('click', () => {
   autoSaveCurrent();
   saveAnnotationsLocal();
   vid.pause();
+  persistInstrModalOpen(true);
   document.getElementById('instrModal').classList.remove('hidden');
 });
 
 document.getElementById('btnCloseModal').addEventListener('click', () => {
+  persistInstrModalOpen(false);
   document.getElementById('instrModal').classList.add('hidden');
 });
 
 document.getElementById('instrModal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('instrModal')) {
+    persistInstrModalOpen(false);
     document.getElementById('instrModal').classList.add('hidden');
   }
 });
@@ -2111,7 +2264,8 @@ function showInstructions() {
 document.getElementById('btnStartAnnotating').addEventListener('click', () => {
   document.getElementById('instructionsOverlay').classList.add('hidden');
   document.getElementById('instrFooter').classList.add('hidden');
-  localStorage.setItem('autolab_instructions_seen', 'true');
+  persistView(VIEW_ANNOTATOR);
+  persistInstructionsSeen();
   enterApp();
 });
 
