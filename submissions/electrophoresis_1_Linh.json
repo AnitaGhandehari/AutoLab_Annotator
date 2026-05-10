@@ -1,0 +1,155 @@
+{
+  "annotator": "Linh",
+  "video": "electrophoresis_1",
+  "video_label": "Electrophoresis 1",
+  "segment_source": "spreadsheet",
+  "segment_duration_sec": null,
+  "annotated_at": "2026-05-10T01:48:50.560Z",
+  "segments": [
+    {
+      "segment": 1,
+      "step_label": "Place the agarose gel into the gel box (electrophoresis unit).",
+      "start": "0:03",
+      "end": "0:10",
+      "equipment": "gel box",
+      "materials": "agarose gel",
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "The person move the agarose gel into the gel box"
+        }
+      ],
+      "visualized_results": null
+    },
+    {
+      "segment": 2,
+      "step_label": "Fill gel box with TAE until the gel is covered.",
+      "start": "0:17",
+      "end": "1:19",
+      "equipment": "Buffer container, gel box",
+      "materials": "TAE buffer, agarose gel",
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "The person opens the valve of the buffer container to fill the gel box with TAE buffer until buffer covers the gel."
+        },
+        {
+          "start_time": "1:09",
+          "text": "[Not visible: ...] The person raises the gel box probably to check the buffer level"
+        },
+        {
+          "start_time": "1:18",
+          "text": "The person fills in the gel box some more buffer"
+        }
+      ],
+      "visualized_results": null
+    },
+    {
+      "segment": 3,
+      "step_label": "Mix the DNA sample with Loading buffer at 1:25 dilution ratio.",
+      "start": "1:33",
+      "end": "3:56",
+      "equipment": "Benchtop centrifuge, ice bucket, tube rack",
+      "materials": "DNA sample, Loading buffer",
+      "steps": [
+        {
+          "start_time": "2:16",
+          "text": "The person centrifuge the tube strip with samples on a benchtop centrifuge for a few seconds."
+        },
+        {
+          "start_time": "1:52",
+          "text": "The person added Loading buffer to DNA sample at 1:25 dilution ratio."
+        },
+        {
+          "start_time": "3:22",
+          "text": "The person shakes the tube strip to mix the buffer and DNA sample."
+        },
+        {
+          "start_time": "3:41",
+          "text": "The person briefly centrifuge the tube strip to collect all samples at the bottom of the tubes."
+        }
+      ],
+      "visualized_results": null
+    },
+    {
+      "segment": 4,
+      "step_label": "Load 5 μL of DNA ladder and samples into wells.",
+      "start": "4:04",
+      "end": "5:56",
+      "equipment": "pipette, pipette tips, gel box",
+      "materials": "agarose gel, DNA ladder, DNA sample",
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "The person loads 5uL of DNA ladder to the first well of the agarose gel"
+        },
+        {
+          "start_time": "4:28",
+          "text": "The person loads 5uL of the first DNA sample to the second well of the agarose gel"
+        },
+        {
+          "start_time": "4:53",
+          "text": "The person loads 5uL of the second DNa sample to the third well of the agarose gel"
+        },
+        {
+          "start_time": "5:10",
+          "text": "The person load 5uL of the third DNA sample to the fourth well of the agarose gel"
+        },
+        {
+          "start_time": "5:26",
+          "text": "The person load 5uL of the fourth DNA sample to the fifth well of the agarose gel"
+        }
+      ],
+      "visualized_results": null
+    },
+    {
+      "segment": 5,
+      "step_label": "Run the gel at 100 V until the dye line is approximately 75-80% of the way down the gel.",
+      "start": "5:57",
+      "end": "6:36",
+      "equipment": "gel box, power supply",
+      "materials": "agarose gel,",
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "The person attaches the power supply to the gel box and run the gel at 100V"
+        }
+      ],
+      "visualized_results": null
+    },
+    {
+      "segment": 6,
+      "step_label": "Turn off power.",
+      "start": "6:40",
+      "end": "6:48",
+      "equipment": "gel box, power supply",
+      "materials": null,
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "The person turns off the gel box and detaches the power supply"
+        }
+      ],
+      "visualized_results": null
+    },
+    {
+      "segment": 7,
+      "step_label": "Visualize the DNA fragments with LED.",
+      "start": "7:16",
+      "end": "8:01",
+      "equipment": "imaging chamber",
+      "materials": "agarose gel",
+      "steps": [
+        {
+          "start_time": "0:00",
+          "text": "The person moves the agarose gel from the gel box to the imaging chamber"
+        },
+        {
+          "start_time": "7:25",
+          "text": "The person turns on the imaging chamber to visualize DNA bands."
+        }
+      ],
+      "visualized_results": null
+    }
+  ]
+}
